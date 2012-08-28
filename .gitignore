@@ -1,2 +1,5 @@
 # node modules
 node_modules/
+
+# temp files for building project
+_temp/
