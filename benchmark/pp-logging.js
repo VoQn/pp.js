@@ -27,12 +27,8 @@
     return any;
   }
 
-  var _get_unix_time = function() {
-    return new Date().getTime();
-  };
-
   var _time_expr = function(from, opt_to) {
-    var to = opt_to || _get_unix_time(),
+    var to = opt_to || Date.now(),
         dt = to - from;
     if (dt > 6.0e+4) {
       return ~~(dt / 6.0e+4) + 'm' +
@@ -47,8 +43,8 @@
   var _start_time, _time_stamp;
 
   var _time_stamp_log = function(label, opt_color) {
-    var now = _get_unix_time(), color;
-    if (now - _time_stamp < pp.TIME_SLICE.FPS_60) {
+    var now = Date.now(), color;
+    if (now - _time_stamp < pp.TIME_SLICE.FPS_1) {
       return;
     }
     color = opt_color || '\x1b[34m';
@@ -229,7 +225,7 @@
 
     return hash;
   };
-  _start_time = _get_unix_time();
+  _start_time = Date.now();
   _time_stamp = _start_time;
 
   pp.map(function(after, runner, runner_name) {
@@ -245,7 +241,7 @@
       after(error, { result: result, time: time });
     };
 
-    runner_start_at = _get_unix_time();
+    runner_start_at = Date.now();
 
     pp.defer(console.log,
         '\x1b[36m' + runner_name + ' - start -- ' +
@@ -256,7 +252,7 @@
       runnner_by_type(runner.type, runner_name, runner.iter),
       callback,
       bigArray,
-      pp.TIME_SLICE.FPS_60);
+      pp.TIME_SLICE.FPS_1);
 
   }, function(error, result) {
     var msg = [
