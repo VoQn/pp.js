@@ -9,7 +9,8 @@ metaContext.until_by = (check) ->
         finished = yes
         callback error
         return
-      memo = __.slice.call(arguments, 1) if arguments.length > 1
+      if arguments.length > 1
+        memo = __.slice.call arguments, 1
       return
 
     proc = ->

@@ -5,7 +5,8 @@ metaContext.filter_by = (tester) ->
 
     filter = (next, value, index) ->
       pushMatched = (error, result) ->
-        stackMatched.push value if not error and tester result
+        if not error and tester result
+          stackMatched.push value
         next error
         return
       iterator pushMatched, value, index, array

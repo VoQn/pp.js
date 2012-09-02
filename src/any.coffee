@@ -4,7 +4,10 @@ metaContext.logical = (test, wrap_callback) ->
 
     check_iterate = (next, value, key, iterable) ->
       after_check = (error, result) ->
-        if test result then next error, value else next error
+        if test result
+          next error, value
+        else
+          next error
         return
       iterator after_check, value, key, iterable
       return
