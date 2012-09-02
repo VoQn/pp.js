@@ -16,6 +16,7 @@ class Trampoline
 
   invoke = ->
     return if procStack.length < 1
+
     current   = procStack.shift()
     timeSlice = timeStack.shift()
     timeLimit = getUnixTime() + timeSlice
@@ -49,7 +50,8 @@ class Trampoline
 
     procStack.push proc
     timeStack.push limitTimeSlice timeSlice
-    invoke() if procStack.length is 1
+    if procStack.length is 1
+      invoke()
     return
 
   partial = (fn) ->

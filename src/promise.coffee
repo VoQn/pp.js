@@ -5,15 +5,18 @@ class Promise
 
   fire = trampoline.partial (promise, value) ->
     promise.result = value
+
     invoke = ->
       entry = promise.stack.shift()
       proc  = if promise.state is REJECTED then entry[1] else entry[0]
+
       if proc
         try
           promise.result = proc.call promise.scope, promise.result
         catch error
           promise.state  = REJECTED
           promise.result = error
+
       shift
 
     finish = ->

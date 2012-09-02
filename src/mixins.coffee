@@ -1,6 +1,3 @@
-###
-# Meta Context
-###
 metaContext =
   iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
     mixin = (iterator, receiver, iterable) ->
@@ -13,9 +10,6 @@ metaContext =
       else
         hashIterator iterator, receiver, iterable
 
-###
-# Control Flow Directionaly
-###
 contexts =
   extend: (params) ->
     for name, proc of params
