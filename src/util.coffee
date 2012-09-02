@@ -1,10 +1,13 @@
-__.extend = (init) ->
-  props = if typeof init is 'function' then init.call @ else init
-  for key, value of props
-    @[key] = value if props.hasOwnProperty key
-  @
+###
+# Internal Utility
+###
 
-__.extend
+__ =
+  extend: (properties) ->
+    for key, value of properties
+      if properties.hasOwnProperty key
+        @[key] = value
+    @
   keys: Object.keys or (any) ->
     key for key of any
   slice: Array::slice
