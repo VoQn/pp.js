@@ -1,0 +1,11 @@
+before_script:
+  - export DISPLAY=:99.0
+  - sleep 5
+
+script:
+  - "npm test"
+
+language: node_js
+
+node_js:
+  - 0.8.0

@@ -16,7 +16,10 @@
   },
   "licenses": {
     "type": "MIT",
-    "url": ""
+    "url": "https://github.com/VoQn/pp.js/blob/master/LICENSE"
+  },
+  "scripts": {
+    "test": "node_modules/buster/bin/buster-test"
   },
   "devDependencies": {
     "grunt": "~0.3.12",
