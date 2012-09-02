@@ -7,28 +7,28 @@ class Trampoline
     slices
 
   current   = null
+  timeSlice = 0
+  timeLimit = 0
   procStack = []
   timeStack = []
 
-  invoke = do ->
-    getTime   = -> new Date().getTime()
-    timeSlice = 0
-    timeLimit = 0
+  getUnixTime = Date.now or -> +new Date
 
-    invoke    = ->
-      return if procStack.length < 1
-      current   = procStack.shift()
-      timeSlice = timeStack.shift()
-      timeLimit = getTime() + timeSlice
+  invoke = ->
+    return if procStack.length < 1
+    current   = procStack.shift()
+    timeSlice = timeStack.shift()
+    timeLimit = getUnixTime() + timeSlice
 
-      while typeof current is 'function' and getTime() < timeLimit
-        current = current()
+    while typeof current is 'function' and getUnixTime() < timeLimit
+      current = current()
 
-      if typeof current is 'function'
-        procStack.push current
-        timeStack.push timeSlice
-      __.defer invoke
-      return
+    if typeof current is 'function'
+      procStack.push current
+      timeStack.push timeSlice
+
+    __.defer invoke
+    return
 
   limitTimeSlice = (timeSlice) ->
     if typeof timeSlice isnt 'number'
@@ -38,27 +38,23 @@ class Trampoline
   register = (fn) ->
     requireLength = fn.length
 
-    if requireLength < arguments.length
-      timeSlice = arguments[requireLength + 1]
-
     if requireLength < 1
       proc = fn
     else
       args = __.slice.call arguments, 1, requireLength + 1
       proc = -> fn.apply null, args
 
+    if requireLength < arguments.length
+      timeSlice = arguments[requireLength + 1]
+
     procStack.push proc
     timeStack.push limitTimeSlice timeSlice
     invoke() if procStack.length is 1
     return
 
-  constructor: ->
-  TIME_SLICE: TIME_SLICE
-  getCurrent: -> current
-  register: register
-  partial: (fn) ->
+  partial = (fn) ->
     partialized = ->
-      args = __.slice.call arguments
+      args = if arguments.length then __.slice.call arguments else []
       if fn.length > args.length
         partial = ->
           return partial if arguments.length < 1
@@ -67,4 +63,12 @@ class Trampoline
         args.unshift fn
         register.apply null, args
 
-pp.TIME_SLICE = Trampoline::TIME_SLICE
+  constuctor: ->
+  TIME_SLICE: TIME_SLICE
+  getCurrent: -> current
+  register:   register
+  partial:    partial
+
+trampoline = new Trampoline()
+
+pp.TIME_SLICE = trampoline.TIME_SLICE

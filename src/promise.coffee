@@ -3,7 +3,7 @@ class Promise
   RESOLVED    = 'resolved'
   REJECTED    = 'rejected'
 
-  fire = Trampoline::partial (promise, value) ->
+  fire = trampoline.partial (promise, value) ->
     promise.result = value
     invoke = ->
       entry = promise.stack.shift()
