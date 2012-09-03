@@ -5,9 +5,9 @@ if typeof require is 'function'
 buster.testCase 'pp.generator',
   'Generator': ->
     cpsCountUp = ->
-      i = 0
-      step = (next) ->
-        next step, ++i
+      index = 0
+      step  = (yieldIt) ->
+        yieldIt step, ++index
       pp.generator step
 
     g = cpsCountUp()
@@ -16,8 +16,7 @@ buster.testCase 'pp.generator',
     assert.same g.next(), 2
     assert.same g.next(), 3
 
-    g.next (v) ->
+    ret = g.next (v) ->
       assert.same v, 4
-
+    assert.same ret, 4
     assert.same g.next(), 5
-
