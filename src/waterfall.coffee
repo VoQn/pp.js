@@ -39,7 +39,7 @@ pp.waterfall = (procs, opt_callback) ->
         callback error
         return
       args =
-        if 2 < arguments.length then [] else __.slice.call arguments, 1
+        if 2 > arguments.length then [] else __.slice.call arguments, 1
       next = proc.next()
       args.unshift if next then wrap next else callback
 
