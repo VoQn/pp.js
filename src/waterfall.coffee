@@ -25,24 +25,36 @@ pp.iterator = (procs) ->
 
 pp.waterfall = (procs, opt_callback) ->
   callback = opt_callback or __.id
+  finished = no
+
   if procs.length is 1
     callback()
     return
-  finished = no
-  next = null
-  args = []
-  wrap = (proc) ->
-    after = (error) ->
+
+  wrap = (iterator) ->
+    wrapped = (error) ->
       return if finished
       if error
         finished = yes
         callback error
         return
-      args =
-        if 2 > arguments.length then [] else __.slice.call arguments, 1
-      next = proc.next()
-      args.unshift if next then wrap next else callback
 
-      proc.apply proc, args
-      return
-  wrap(pp.iterator(procs))()
+      args =
+        if 2 > arguments.length
+        then []
+        else __.slice.call arguments, 1
+
+      next = iterator.next()
+      if next
+        args.unshift wrap next
+      else
+        args.unshift ->
+          results = __.slice.call arguments
+          callback.apply null, results
+          iterator.clearCache()
+          return
+
+      __.defer ->
+        iterator.apply iterator, args
+
+  __.defer wrap pp.iterator procs
