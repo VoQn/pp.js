@@ -18,6 +18,7 @@ module.exports = function(grunt) {
           'src/util.coffee',
           'src/trampoline.coffee',
           'src/promise.coffee',
+          'src/generator.coffee',
           'src/mixins.coffee',
           'src/each.coffee',
           'src/map.coffee',
@@ -25,7 +26,8 @@ module.exports = function(grunt) {
           'src/filter.coffee',
           'src/any.coffee',
           'src/whilist.coffee',
-          'src/task.coffee'
+          'src/task.coffee',
+          'src/waterfall.coffee'
         ],
         dest: '_temp/pp.coffee'
       }
