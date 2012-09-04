@@ -1,0 +1,554 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>pp.js by VoQn</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>pp.js</h1>
+        <p>Pseudo-Parallel, Passing-Procedure, Pretty-Promise. Asynchronous Collection &amp; Procedure Control Flow</p>
+        <p class="view"><a href="https://github.com/VoQn/pp.js">View the Project on GitHub <small>VoQn/pp.js</small></a></p>
+        <ul>
+          <li><a href="https://github.com/VoQn/pp.js/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/VoQn/pp.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/VoQn/pp.js">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>pp.js - pianissimo -</h1>
+
+<p><a href="http://travis-ci.org/VoQn/pp.js"><img src="https://secure.travis-ci.org/VoQn/pp.js.png" alt="Build Status"></a></p>
+
+<p><strong>pp.js</strong> calls <strong>pianissimo.js</strong>, meaning <em>Pseudo-Parallel</em>, <em>Passing-Procedure</em>, <em>Pretty-Promise</em>.
+pp.js is javascript library for Asynchronous Collection &amp; Procedure Control Flow.</p>
+
+<p>this library inspired by <a href="https://github.com/caolan/async">async.js</a>, <a href="http://cho45.stfuawsc.com/jsdeferred/">JsDeferred</a>, <a href="http://api.jquery.com/category/deferred-object/">$.Deferred</a>, <a href="http://wiki.commonjs.org/wiki/Promises/A">Promise/A</a>.
+And aiming provide compatible API.</p>
+
+<p>for read this library specification see <a href="#guide">Guide</a>, <a href="#reference">Reference</a></p>
+
+<h2>License</h2>
+
+<p>MIT License. see LICENSE file.</p>
+
+<h2>API</h2>
+
+<h3>Continuation Object</h3>
+
+<p>These function create instance of <code>Promise</code> and <code>Generator</code> that controller
+about Asynchonouse routine.</p>
+
+<ul>
+<li>
+<a href="#promise">pp.promise</a> - Implement <a href="http://wiki.commonjs.org/wiki/Promises/A">Promise/A</a> of <a href="http://www.commonjs.org/">CommonJS</a>
+</li>
+<li>
+<a href="#generator">pp.generator</a> - simple <a href="http://wiki.ecmascript.org/doku.php?id=harmony:generators">Generator</a> like <a href="https://mail.mozilla.org/pipermail/es-discuss/2008-August/006837.html">ES-Harmony</a>
+</li>
+</ul><h3>Control Flow against Array as procedures</h3>
+
+<p>These API are very similar to functions of async.js.
+But here is different argument rule, never blocking user thread, and faster.</p>
+
+<ul>
+<li>
+<a href="#iterator">pp.iterator</a> - like <a href="https://github.com/caolan/async#iterator">async.iterator</a>
+</li>
+<li>
+<a href="#waterfall">pp.waterfall</a> - like <a href="https://github.com/caolan/async#waterfall">async.waterfall</a>
+</li>
+<li>
+<a href="#whilist">pp.whilist</a> - like
+<a href="https://github.com/caolan/async#whilist">async.whilist</a>
+</li>
+<li>
+<a href="#until">pp.until</a> - like <a href="https://github.com/caolan/async#until">async.until</a>
+</li>
+<li>
+<a href="#fill">pp.fill</a> - like
+<a href="https://github.com/caolan/async#parallel">async.parallel</a>
+</li>
+<li>
+<a href="#order">pp.order</a> - like <a href="https://github.com/caolan/async#series">async.series</a>
+</li>
+</ul><h3>Collection API</h3>
+
+<p>These API are very similar to functions of async.js.
+But here is different argument rule, never blocking user thread, never occuring
+<code>Stack Over Flow</code>, faster (x 1.5 ~ 2.0), and use less heap memory (x ~0.5).</p>
+
+<ul>
+<li>
+<a href="#each">pp.each</a> - like <a href="https://github.com/caolan/async#forEach">async.forEach</a>, <a href="https://github.com/caolan/async#forEach">async.forEachLimit</a>
+</li>
+<li>
+<a href="#eachOrder">pp.eachOrder</a> - like <a href="https://github.com/caolan/async#forEach">async.forEachSeries</a>
+</li>
+<li>
+<a href="#map">pp.map</a> - like <a href="https://github.com/caolan/async#map">async.map</a>
+</li>
+<li>
+<a href="#mapOrder">pp.mapOrder</a> - like <a href="https://github.com/caolan/async#map">async.mapOrder</a>
+</li>
+<li>
+<a href="#filter">pp.filter</a> - like
+<a href="https://github.com/caolan/async#filter">async.filter</a>
+</li>
+<li>
+<a href="#reject">pp.reject</a> - like
+<a href="https://github.com/caolan/async#reject">async.reject</a>
+</li>
+<li>
+<a href="#find">pp.find</a> - like <a href="https://github.com/caolan/async#detect">async.detect</a>
+</li>
+<li>
+<a href="#any">pp.any</a> - like <a href="https://github.com/caolan/async#some">async.some</a>
+</li>
+<li>
+<a href="#all">pp.all</a> - like <a href="https://github.com/caolan/async#every">async.every</a>
+</li>
+<li>
+<a href="#foldl">pp.foldl</a> - like <a href="https://github.com/caolan/async#reduce">async.reduce</a>
+</li>
+<li><a href="#foldl1">pp.foldl1</a></li>
+<li>
+<a href="#foldr">pp.foldr</a> - like
+<a href="https://github.com/caolan/async#reduce">async.redureRight</a>
+</li>
+<li><a href="#foldr1">pp.foldr1</a></li>
+</ul><h3>Plugin Extention Interface, and Etc...</h3>
+
+<ul>
+<li>
+<a href="#extend">pp.extend</a> if want to add extention, call this.</li>
+<li>
+<a href="#defer">pp.defer</a> deferring (use <code>process.nextTick</code> (node.js) or
+<code>setTimeout(fn, 0, args...)</code>)</li>
+<li>
+<a href="#timeslice">pp.TIME_SLICE</a> preset parameters X fps (ms)</li>
+<li><a href="#noconflict">pp.noConflict</a></li>
+</ul><hr><p><a name="guide"></a></p>
+
+<h1>Guide</h1>
+
+<h2>CPS (Continuation Passing Style)</h2>
+
+<p><strong>pp.js</strong> is designed by CPS, <em>Continuation Passing Style</em>, for effective Asynchronous
+processing.</p>
+
+<h2>Trampolining, "Pseudo-Parallel"</h2>
+
+<p><strong>pp.js</strong> doesn't provide <em>true</em> parallel processing. Parallel processing is a strictly pseudo.
+This pseudo-parallel processing on <a href="http://en.wikipedia.org/wiki/Trampoline_(computing)">Trampoling</a>.</p>
+
+<h2>Public API are curried</h2>
+
+<p><strong>pp.js</strong> API are curried function.</p>
+
+<p>For example, CPS sum of number array is this.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">printSum</span> <span class="o">=</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">foldl</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">memo</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">value</span> <span class="o">!==</span> <span class="s1">'number'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s1">'"folding" require number, but '</span> <span class="o">+</span> <span class="k">typeof</span> <span class="nx">value</span><span class="p">));</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">memo</span> <span class="o">+</span> <span class="nx">value</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">},</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// See it! subject array has not apply!</span>
+
+<span class="nx">printSum</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">]);</span> <span class="c1">//=&gt; 33</span>
+<span class="nx">printSum</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span> <span class="c1">//=&gt; 15</span>
+</pre></div>
+
+<h2>Invocation type of callback, "fill" and "order"</h2>
+
+<p>In designing Asynchronous operetion, maybe occur a problem that dependency with
+each procedures.</p>
+
+<p>Because solve it, pp.js provide two iteration. <em>fill</em> and <em>order</em>.</p>
+
+<h3>fill</h3>
+
+<p><code>fill</code> process is ASAP (As Soon As Possible)</p>
+
+<div class="highlight"><pre><span class="nx">fireStack</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="nx">pp</span><span class="p">.</span><span class="nx">fill</span><span class="p">([</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fireStack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'1st'</span><span class="p">);</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'1st'</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">100</span><span class="p">);</span>
+  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fireStack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'2nd'</span><span class="p">);</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'2nd'</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">200</span><span class="p">);</span>
+  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fireStack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'3rd'</span><span class="p">);</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'3rd'</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">}],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// result     --- ['1st', '2nd', '3rd']</span>
+    <span class="c1">// fire_stack --- ['3rd', '1st', '2nd']</span>
+  <span class="p">});</span>
+</pre></div>
+
+<h3>order</h3>
+
+<p><code>order</code> process is keep invocation order.</p>
+
+<div class="highlight"><pre><span class="nx">fireStack</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="nx">pp</span><span class="p">.</span><span class="nx">order</span><span class="p">([</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fireStack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'1st'</span><span class="p">);</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'1st'</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">100</span><span class="p">);</span>
+  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fireStack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'2nd'</span><span class="p">);</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'2nd'</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">200</span><span class="p">);</span>
+  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fireStack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'3rd'</span><span class="p">);</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'3rd'</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">}],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// result     --- ['1st', '2nd', '3rd']</span>
+    <span class="c1">// fire_stack --- ['1st', '2nd', '3rd']</span>
+  <span class="p">});</span>
+</pre></div>
+
+<h2>Type</h2>
+
+<p>A difference between <strong>pp.js</strong> with <strong>async.js</strong> is consisting argument format.</p>
+
+<h3>TimeSlice: number</h3>
+
+<p><code>pp.TIME_SLICE</code> provide consts for frame rate.</p>
+
+<ul>
+<li>FPS_240 -  4ms</li>
+<li>FPS_120 -  8ms</li>
+<li>FPS_60  - 16ms</li>
+<li>FPS_30  - 33ms</li>
+<li>FPS_15  - 66ms</li>
+<li>FPS_1   -  1s (1000ms)</li>
+</ul><h3>Iterator: function(callback, [somethings...])</h3>
+
+<p><strong>pp.js</strong> defined <strong>Iterator</strong> type that is <code>function(callback, [somethings...])</code> </p>
+
+<p>For example, available iterator for Array</p>
+
+<ul>
+<li><code>function(function:next, any:value, number:index, array:iterable)</code></li>
+<li><code>function(function:next, any:value, number:index)</code></li>
+<li><code>function(function:next, any:value)</code></li>
+<li><code>function(function:next)</code></li>
+</ul><p>for Object,</p>
+
+<ul>
+<li><code>function(function:next, any:value, string:key, object:iterable)</code></li>
+<li><code>function(function:next, any:value, string:key)</code></li>
+<li><code>function(function:next, any:value)</code></li>
+<li><code>function(function:next)</code></li>
+</ul><p>iterator type need continuation function for 1st argument.</p>
+
+<hr><h3>Predicator: function(callback, value, [key, iterable])</h3>
+
+<p><strong>pp.js</strong> defined <strong>Predicator</strong> type that is <code>function(callback, value, [key, iterable])</code></p>
+
+<p>Specially, predicator passing <code>boolean</code> result to callback.</p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">cpsIsEven</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">value</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+
+<hr><h3>Accumulator: function(callback, memo, value, [key, iterable])</h3>
+
+<p><strong>pp.js</strong> defined <strong>Folding</strong> type that is <code>function(callback, memo, value, [key, iterable])</code>.</p>
+
+<p>for accumulate array list.</p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">cpsAdd</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">memo</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">memo</span> <span class="o">+</span> <span class="nx">value</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+
+<hr><h3>Callback: function(?Error, [somethings...])</h3>
+
+<p><strong>pp.js</strong> defined <strong>Callback</strong> type that is <code>function(Error, [somethings...])</code>.</p>
+
+<p>first argument, received Error, is accepted as <strong>nullable</strong>.</p>
+
+<hr><h3>Iterable: (!Array | !Object as {string: any})</h3>
+
+<p><strong>pp.js</strong> defined <strong>Iterable</strong> type that is <strong>not null</strong> Array or Object.</p>
+
+<p>primitive values ... <code>undefined</code>, <code>null</code>, <code>string</code>, <code>boolean</code> and <code>number</code> aren't accepted.</p>
+
+<hr><p><a name="reference"></a></p>
+
+<h1>Referrence</h1>
+
+<p><strong>|||documentation writing now...|||</strong></p>
+
+<h2>Collection API</h2>
+
+<p><a name="each"></a></p>
+
+<h3>pp.each(iterator, callback, iterable, [timeSlice])</h3>
+
+<h4>Arguments</h4>
+
+<ul>
+<li>iterator(callback, [value, index, iterable]) - iteration procedure</li>
+<li>callback(error, [somethings...]) - callback for after iteration</li>
+<li>iterable - <strong>not Nullable</strong> Array or Object as HashMap (<code>{{string: *}}</code>)</li>
+<li>timeSlice - <strong>optional</strong> time slice for iteration loop.</li>
+</ul><h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">itrable</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do something</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">errorCondition</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// when it should throw Error, instead of call</span>
+      <span class="nx">next</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">haltCondition</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// when it should halt iteration (purpose has been achieved)</span>
+      <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// call iteration callback simply</span>
+      <span class="nx">next</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do something when finish (or halt) iteration</span>
+  <span class="p">},</span> <span class="p">[</span><span class="s1">'a.coffee'</span><span class="p">,</span> <span class="s1">'b.coffee'</span><span class="p">,</span> <span class="s1">'c.coffee'</span><span class="p">]);</span>
+</pre></div>
+
+<p><a name="eachOrder"></a></p>
+
+<h3>pp.eachOrder(iterator, callback, iterable, [timeSlice])</h3>
+
+<p><code>pp.eachOrder</code> is another version of <code>pp.each</code> that keep invocation callback order.</p>
+
+<hr><p><a name="map"></a></p>
+
+<h3>pp.map(iterator, callback, iterable, [timeSlice])</h3>
+
+<h4>Arguments</h4>
+
+<ul>
+<li>iterator(callback, [value, index, iterable]) - iteration procedure</li>
+<li>callback(error, [somethings...]) - callback for after iteration</li>
+<li>iterable - <strong>not Nullable</strong> Array or Object as HashMap (<code>{{string: *}}</code>)</li>
+<li>timeSlice - <strong>optional</strong> time slice for iteration loop.</li>
+</ul><h4>Example</h4>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">cpsSqMap</span> <span class="o">=</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">value</span> <span class="o">!==</span> <span class="s1">'number'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s1">'cpsSqMap require number array. but include'</span> <span class="o">+</span>
+      <span class="k">typeof</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">' ('</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">') at ['</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">']'</span><span class="p">));</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">value</span> <span class="o">*</span> <span class="nx">value</span><span class="p">);</span>
+  <span class="p">});</span>
+
+<span class="nx">cpsSqMap</span><span class="p">(</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>
+<span class="c1">//=&gt; null [1, 4, 9, 16, 25]</span>
+
+<span class="nx">cpsSqMap</span><span class="p">(</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'3'</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>
+<span class="c1">//=&gt; [TypeError: cpsSqMap require number array. but include string (3) at [2]] [ 1, 4 ]</span>
+</pre></div>
+
+<p><a name="mapOrder"></a></p>
+
+<h3>pp.mapOrder(iterator, callback, iterable, [timeSlice])</h3>
+
+<p><code>pp.mapOrder</code> is another version of <code>pp.each</code> that keep invocation callback order.</p>
+
+<hr><p><a name="filter"></a></p>
+
+<h3>pp.filter(predicator, callback, iterable, [timeSlice])</h3>
+
+<p><code>pp.filter</code>'s invocation is <em>order</em></p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">cpsOdd</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">value</span> <span class="o">!==</span> <span class="s1">'number'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s1">'cpsOdd require number array. but include'</span> <span class="o">+</span>
+      <span class="k">typeof</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">' ('</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">') at ['</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">']'</span><span class="p">));</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">value</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// apply 2nd arg as boolean</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">printCallback</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span> <span class="o">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="o">:</span> <span class="nx">results</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">pp</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>
+<span class="c1">//=&gt; [1, 3, 5]</span>
+<span class="nx">pp</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]);</span>
+<span class="c1">//=&gt; []</span>
+</pre></div>
+
+<hr><p><a name="reject"></a></p>
+
+<h3>pp.reject(predicator, callback, iterable, [timeSlice])</h3>
+
+<p>complement of <code>pp.filter</code></p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>
+<span class="c1">//=&gt; [2, 4]</span>
+<span class="nx">pp</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">]);</span>
+<span class="c1">//=&gt; [10, 12, 14, 16, 18]</span>
+</pre></div>
+
+<hr><p><a name="find"></a></p>
+
+<h3>pp.find(predicator, callback, iterable, [timeSlice])</h3>
+
+<p>lookup match value from iterable.</p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>
+<span class="c1">//=&gt; 1</span>
+<span class="nx">pp</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">]);</span>
+<span class="c1">//=&gt; undefined</span>
+</pre></div>
+
+<hr><p><a name="any"></a></p>
+
+<h3>pp.any(predicator, callback, iterable, [timeSlice])</h3>
+
+<p><code>pp.any</code> is CPS <code>Array.some</code></p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">any</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="c1">//=&gt; true</span>
+<span class="nx">pp</span><span class="p">.</span><span class="nx">any</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="c1">//=&gt; false</span>
+</pre></div>
+
+<hr><p><a name="all"></a></p>
+
+<h3>pp.all(predicator, callback, iterable, [timeSlice])</h3>
+
+<p><code>pp.all</code> is CPS <code>Array.every</code></p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="c1">//=&gt; false</span>
+<span class="nx">pp</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">cpsOdd</span><span class="p">,</span> <span class="nx">printCallback</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="c1">//=&gt; true</span>
+</pre></div>
+
+<hr><p><a name="foldl"></a></p>
+
+<h3>pp.foldl(accumulator, callback, init, array, [timeSlice])</h3>
+
+<p>folding accumulation left(first of array) to right(last of array).</p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">foldl</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">r</span> <span class="o">+</span> <span class="nx">x</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>  <span class="c1">// =&gt; 15</span>
+<span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span> <span class="c1">// 0 + 1 + 2 + 3 + 4 + 5 =&gt; 15</span>
+</pre></div>
+
+<hr><p><a name="foldl1"></a></p>
+
+<h3>pp.foldl1(accumulator, callback, array, [timeSlice])</h3>
+
+<p><code>pp.foldl1</code> require Array has 1 or more length. use first element from Array as <code>init</code> value.</p>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">foldl1</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">r</span> <span class="o">+</span> <span class="nx">x</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span> <span class="c1">// =&gt; 15</span>
+<span class="p">},</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>   <span class="c1">// 1 + 2 + 3 + 4 + 5 =&gt; 15</span>
+
+<span class="nx">pp</span><span class="p">.</span><span class="nx">foldl1</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">r</span> <span class="o">+</span> <span class="nx">x</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span> <span class="c1">// =&gt; TypeError</span>
+<span class="p">},</span> <span class="p">[]);</span> <span class="c1">// empty array :^(</span>
+</pre></div>
+
+<hr><p><a name="foldr"></a></p>
+
+<h3>pp.foldr(accumulator, callback, init, array, [timeSlice])</h3>
+
+<p>folding accumulation right(last of array) to left(first of array).</p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">foldr</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">r</span> <span class="o">+</span> <span class="nx">x</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>  <span class="c1">// =&gt; 15</span>
+<span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span> <span class="c1">// 0 + 5 + 4 + 3 + 2 + 1 =&gt; 15</span>
+</pre></div>
+
+<hr><p><a name="foldr1"></a></p>
+
+<h3>pp.foldr1(accumulator, callback, array, [timeSlice])</h3>
+
+<p><code>pp.foldr1</code> require Array has 1 or more length. use last element from Array as <code>init</code> value.</p>
+
+<h4>Example</h4>
+
+<div class="highlight"><pre><span class="nx">pp</span><span class="p">.</span><span class="nx">foldr1</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">r</span> <span class="o">+</span> <span class="nx">x</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span> <span class="c1">// =&gt; 15</span>
+<span class="p">},</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span>   <span class="c1">// 5 + 4 + 3 + 2 + 1 =&gt; 15</span>
+</pre></div>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/VoQn">VoQn</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-33864951-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
