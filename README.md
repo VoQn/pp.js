@@ -309,8 +309,15 @@ cpsSqMap(console.log, [1, 2, '3', 4, 5]);
 -------------------------------------------------------------------------------
 
 <a name="filter"/>
-### pp.filter(predicator, callback, iterable, [timeSlice])
+### pp.filter(predicator, callback, array, [timeSlice])
 `pp.filter`'s invocation is _order_
+
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
@@ -337,8 +344,15 @@ pp.filter(cpsOdd, printCallback, [2, 4, 6, 8, 10]);
 -------------------------------------------------------------------------------
 
 <a name="reject"/>
-### pp.reject(predicator, callback, iterable, [timeSlice])
+### pp.reject(predicator, callback, array, [timeSlice])
 complement of `pp.filter`
+
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
@@ -355,6 +369,13 @@ pp.reject(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
 ### pp.find(predicator, callback, iterable, [timeSlice])
 lookup match value from iterable.
 
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 
 ```javascript
@@ -369,6 +390,13 @@ pp.find(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
 <a name="any"/>
 ### pp.any(predicator, callback, iterable, [timeSlice])
 `pp.any` is CPS `Array.some`
+
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
@@ -385,6 +413,13 @@ pp.any(cpsOdd, printCallback, [2, 4, 6, 8, 10])
 ### pp.all(predicator, callback, iterable, [timeSlice])
 `pp.all` is CPS `Array.every`
 
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 
 ```javascript
@@ -400,6 +435,16 @@ pp.all(cpsOdd, printCallback, [1, 3, 5, 7, 9])
 ### pp.foldl(accumulator, callback, init, array, [timeSlice])
 folding accumulation left(first of array) to right(last of array).
 
+`pp.foldl`'s invocation is _order_
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* init - init value for accumulation
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 ```javascript
 pp.foldl(function(next, r, x) {
@@ -414,6 +459,15 @@ pp.foldl(function(next, r, x) {
 <a name="foldl1"/>
 ### pp.foldl1(accumulator, callback, array, [timeSlice])
 `pp.foldl1` require Array has 1 or more length. use first element from Array as `init` value.
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
+
+#### Example
 
 ```javascript
 pp.foldl1(function(next, r, x) {
@@ -435,6 +489,16 @@ pp.foldl1(function(next, r, x) {
 ### pp.foldr(accumulator, callback, init, array, [timeSlice])
 folding accumulation right(last of array) to left(first of array).
 
+`pp.foldl`'s invocation is _order_
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* init - init value for accumulation
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 
 ```javascript
@@ -450,6 +514,13 @@ pp.foldr(function(next, r, x) {
 <a name="foldr1"/>
 ### pp.foldr1(accumulator, callback, array, [timeSlice])
 `pp.foldr1` require Array has 1 or more length. use last element from Array as `init` value.
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
