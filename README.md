@@ -41,9 +41,7 @@ But here is different argument rule, never blocking user thread, never occuring
 `Stack Over Flow`, faster (x 1.5 ~ 2.0), and use less heap memory (x ~0.5).
 
 + [pp.each](#each) - like [async.forEach](https://github.com/caolan/async#forEach), [async.forEachLimit](https://github.com/caolan/async#forEach)
-+ [pp.eachOrder](#eachOrder) - like [async.forEachSeries](https://github.com/caolan/async#forEach)
 + [pp.map](#map) - like [async.map](https://github.com/caolan/async#map)
-+ [pp.mapOrder](#mapOrder) - like [async.mapOrder](https://github.com/caolan/async#map)
 + [pp.filter](#filter) - like
   [async.filter](https://github.com/caolan/async#filter)
 + [pp.reject](#reject) - like
@@ -52,10 +50,8 @@ But here is different argument rule, never blocking user thread, never occuring
 + [pp.any](#any) - like [async.some](https://github.com/caolan/async#some)
 + [pp.all](#all) - like [async.every](https://github.com/caolan/async#every)
 + [pp.foldl](#foldl) - like [async.reduce](https://github.com/caolan/async#reduce)
-+ [pp.foldl1](#foldl1)
 + [pp.foldr](#foldr) - like
   [async.redureRight](https://github.com/caolan/async#reduce)
-+ [pp.foldr1](#foldr1)
 
 ### Plugin Extention Interface, and Etc...
 
