@@ -238,6 +238,144 @@ primitive values ... `undefined`, `null`, `string`, `boolean` and `number` aren'
 
 __|||documentation writing now...|||__
 
+## Control Flow
+<a name="iterator"/>
+### pp.iterator(procs)
+
+#### Arguments
+* procs: Array.<function(any...)> - procedure list
+
+#### Example
+
+```javascript
+var current = '',
+  iter = pp.iterator([
+    function() {
+      current = '1st';
+    },
+    function() {
+      current = '2nd';
+    },
+    function() {
+      current = '3rd';
+    }
+  ]);
+
+iter2 = iter();
+console.log(current); // '1st'
+
+iter3 = iter2();
+console.log(current); // '2nd'
+
+iter3()
+console.log(current); // '3rd'
+
+iter4 = iter.next();
+iter4();
+console.log(current); // '2nd'
+```
+
+-------------------------------------------------------------------------------
+
+<a name="waterfall"/>
+### pp.waterfall(procs, [callback])
+
+#### Arguments
+* procs {Array.&lt;Iterator&gt;} - procedure list
+* callback(error, results...) - callback after iteration
+
+#### Example
+```javascript
+pp.waterfall([
+  function(next) {
+    next(null, 1);
+  },
+  function(next, v) {
+    next(null, v, v * 2); // v:1
+  },
+  function(next, v1, v2);
+    next(null, v1 + v2); // {v1: 1, v2: 2}
+  }
+], function(error, result) {
+  console.log(error === null); // true
+  console.log(result); // 3
+});
+```
+
+-------------------------------------------------------------------------------
+
+<a name="whilist"/>
+### pp.whilist(predicator, iterator, callback, [init])
+
+-------------------------------------------------------------------------------
+
+<a name="until"/>
+### pp.until(predicator, iterator, callback, [init])
+
+-------------------------------------------------------------------------------
+
+<a name="fill"/>
+### pp.fill(procs, [callback])
+
+#### Example
+```javascript
+fireStack = [];
+
+pp.fill([
+  function(next) {
+    setTimeout(function() {
+      fireStack.push('1st');
+      next(null, '1st');
+    }, 100);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('2nd');
+      next(null, '2nd');
+    }, 200);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('3rd');
+      next(null, '3rd');
+    }, 50)
+  }], function(error, result) {
+    // result     --- ['1st', '2nd', '3rd']
+    // fire_stack --- ['3rd', '1st', '2nd']
+  });
+```
+
+-------------------------------------------------------------------------------
+
+<a name="order"/>
+### pp.order(procs, [callback])
+
+#### Example
+```javascript
+fireStack = [];
+
+pp.order([
+  function(next) {
+    setTimeout(function() {
+      fireStack.push('1st');
+      next(null, '1st');
+    }, 100);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('2nd');
+      next(null, '2nd');
+    }, 200);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('3rd');
+      next(null, '3rd');
+    }, 50)
+  }], function(error, result) {
+    // result     --- ['1st', '2nd', '3rd']
+    // fire_stack --- ['1st', '2nd', '3rd']
+  });
+```
+
+-------------------------------------------------------------------------------
+
 ## Collection API
 <a name="each"/>
 ### pp.each(iterator, callback, iterable, [timeSlice])
