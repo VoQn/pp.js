@@ -16,15 +16,24 @@ metaContext.until_by = (check) ->
     afterCheck = (error, result) ->
       if check result
         finished = yes
-        callback.apply null, [null].concat memo
+        memo.unshift null
+        callback.apply null, memo
         return
-      iterator.apply null, [next].concat memo
+      memo.unshift next
+      iterator.apply null, memo
       return
 
-    proc = ->
-      return if finished
-      test.apply null, [afterCheck].concat memo
-      proc
+    iterate = pp.context
+      func: (after, args) ->
+        test.apply null, after.concat args
+        main
+      args: [[afterCheck]]
+
+    main = pp.context
+      func: ->
+        return if finished
+        iterate.args[1] = memo
+        iterate
 
 contexts.extend
   whilist: metaContext.until_by __.not

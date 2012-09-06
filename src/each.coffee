@@ -7,7 +7,6 @@ __.extend.call metaContext,
         callback null
         return
 
-      index = 0
       count = 0
       finished = no
 
@@ -15,17 +14,21 @@ __.extend.call metaContext,
         ++count
         if not finished and (count >= LIMIT or error or arguments.length > 1)
           finished = yes
-          args = __.slice.call arguments, 1
+          args = if 2 < arguments.length then [] else __.slice.call arguments, 1
           args.unshift error or null
           callback.apply null, args
           return
 
-      proc = ->
-        return if finished
-        if isShouldStep index, LIMIT, count
-          iterator next, array[index], index, array
-          ++index
-        proc
+      main = pp.context
+        func: (after, value, index, iterable) ->
+          return if finished
+          if isShouldStep index, LIMIT, count
+            iterator after, value, index, iterable
+            main.args[1] = iterable[index + 1]
+            main.args[2] = index + 1
+          main
+        args: [next, array[0], 0, array]
+        scope: array
 
   hashEachBy: (eachProc) ->
     makeProc = (iterator, callback, hash) ->

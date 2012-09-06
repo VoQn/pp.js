@@ -6,6 +6,7 @@ class Trampoline
       slices["FPS_#{rate}"] = Math.ceil(1000 / rate) - 1
     slices
 
+  previous  = null
   current   = null
   timeSlice = 0
   timeLimit = 0
@@ -21,10 +22,11 @@ class Trampoline
     timeSlice = timeStack.shift()
     timeLimit = getUnixTime() + timeSlice
 
-    while typeof current is 'function' and getUnixTime() < timeLimit
-      current = current()
+    while current instanceof Context and getUnixTime() < timeLimit
+      previous = current
+      current = current.evaluate()
 
-    if typeof current is 'function'
+    if current instanceof Context
       procStack.push current
       timeStack.push timeSlice
 
@@ -40,10 +42,10 @@ class Trampoline
     requireLength = fn.length
 
     if requireLength < 1
-      proc = fn
+      proc = fn()
     else
       args = __.slice.call arguments, 1, requireLength + 1
-      proc = -> fn.apply null, args
+      proc = fn.apply null, args
 
     if requireLength < arguments.length
       timeSlice = arguments[requireLength + 1]
@@ -67,7 +69,7 @@ class Trampoline
 
   constuctor: ->
   TIME_SLICE: TIME_SLICE
-  getCurrent: -> current
+  getLast: -> previous
   register:   register
   partial:    partial
 
