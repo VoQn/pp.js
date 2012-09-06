@@ -243,7 +243,7 @@ __|||documentation writing now...|||__
 ### pp.iterator(procs)
 
 #### Arguments
-* procs: Array.<function(any...)> - procedure list
+* procs {Array.&lt;function(any...)&gt;} - procedure list
 
 #### Example
 
