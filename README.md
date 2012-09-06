@@ -41,9 +41,7 @@ But here is different argument rule, never blocking user thread, never occuring
 `Stack Over Flow`, faster (x 1.5 ~ 2.0), and use less heap memory (x ~0.5).
 
 + [pp.each](#each) - like [async.forEach](https://github.com/caolan/async#forEach), [async.forEachLimit](https://github.com/caolan/async#forEach)
-+ [pp.eachOrder](#eachOrder) - like [async.forEachSeries](https://github.com/caolan/async#forEach)
 + [pp.map](#map) - like [async.map](https://github.com/caolan/async#map)
-+ [pp.mapOrder](#mapOrder) - like [async.mapOrder](https://github.com/caolan/async#map)
 + [pp.filter](#filter) - like
   [async.filter](https://github.com/caolan/async#filter)
 + [pp.reject](#reject) - like
@@ -52,10 +50,8 @@ But here is different argument rule, never blocking user thread, never occuring
 + [pp.any](#any) - like [async.some](https://github.com/caolan/async#some)
 + [pp.all](#all) - like [async.every](https://github.com/caolan/async#every)
 + [pp.foldl](#foldl) - like [async.reduce](https://github.com/caolan/async#reduce)
-+ [pp.foldl1](#foldl1)
 + [pp.foldr](#foldr) - like
   [async.redureRight](https://github.com/caolan/async#reduce)
-+ [pp.foldr1](#foldr1)
 
 ### Plugin Extention Interface, and Etc...
 
@@ -242,6 +238,144 @@ primitive values ... `undefined`, `null`, `string`, `boolean` and `number` aren'
 
 __|||documentation writing now...|||__
 
+## Control Flow
+<a name="iterator"/>
+### pp.iterator(procs)
+
+#### Arguments
+* procs: Array.<function(any...)> - procedure list
+
+#### Example
+
+```javascript
+var current = '',
+  iter = pp.iterator([
+    function() {
+      current = '1st';
+    },
+    function() {
+      current = '2nd';
+    },
+    function() {
+      current = '3rd';
+    }
+  ]);
+
+iter2 = iter();
+console.log(current); // '1st'
+
+iter3 = iter2();
+console.log(current); // '2nd'
+
+iter3()
+console.log(current); // '3rd'
+
+iter4 = iter.next();
+iter4();
+console.log(current); // '2nd'
+```
+
+-------------------------------------------------------------------------------
+
+<a name="waterfall"/>
+### pp.waterfall(procs, [callback])
+
+#### Arguments
+* procs {Array.&lt;Iterator&gt;} - procedure list
+* callback(error, results...) - callback after iteration
+
+#### Example
+```javascript
+pp.waterfall([
+  function(next) {
+    next(null, 1);
+  },
+  function(next, v) {
+    next(null, v, v * 2); // v:1
+  },
+  function(next, v1, v2);
+    next(null, v1 + v2); // {v1: 1, v2: 2}
+  }
+], function(error, result) {
+  console.log(error === null); // true
+  console.log(result); // 3
+});
+```
+
+-------------------------------------------------------------------------------
+
+<a name="whilist"/>
+### pp.whilist(predicator, iterator, callback, [init])
+
+-------------------------------------------------------------------------------
+
+<a name="until"/>
+### pp.until(predicator, iterator, callback, [init])
+
+-------------------------------------------------------------------------------
+
+<a name="fill"/>
+### pp.fill(procs, [callback])
+
+#### Example
+```javascript
+fireStack = [];
+
+pp.fill([
+  function(next) {
+    setTimeout(function() {
+      fireStack.push('1st');
+      next(null, '1st');
+    }, 100);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('2nd');
+      next(null, '2nd');
+    }, 200);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('3rd');
+      next(null, '3rd');
+    }, 50)
+  }], function(error, result) {
+    // result     --- ['1st', '2nd', '3rd']
+    // fire_stack --- ['3rd', '1st', '2nd']
+  });
+```
+
+-------------------------------------------------------------------------------
+
+<a name="order"/>
+### pp.order(procs, [callback])
+
+#### Example
+```javascript
+fireStack = [];
+
+pp.order([
+  function(next) {
+    setTimeout(function() {
+      fireStack.push('1st');
+      next(null, '1st');
+    }, 100);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('2nd');
+      next(null, '2nd');
+    }, 200);
+  }, function(next) {
+    setTimeout(function() {
+      fireStack.push('3rd');
+      next(null, '3rd');
+    }, 50)
+  }], function(error, result) {
+    // result     --- ['1st', '2nd', '3rd']
+    // fire_stack --- ['1st', '2nd', '3rd']
+  });
+```
+
+-------------------------------------------------------------------------------
+
 ## Collection API
 <a name="each"/>
 ### pp.each(iterator, callback, iterable, [timeSlice])
@@ -313,8 +447,15 @@ cpsSqMap(console.log, [1, 2, '3', 4, 5]);
 -------------------------------------------------------------------------------
 
 <a name="filter"/>
-### pp.filter(predicator, callback, iterable, [timeSlice])
+### pp.filter(predicator, callback, array, [timeSlice])
 `pp.filter`'s invocation is _order_
+
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
@@ -341,8 +482,15 @@ pp.filter(cpsOdd, printCallback, [2, 4, 6, 8, 10]);
 -------------------------------------------------------------------------------
 
 <a name="reject"/>
-### pp.reject(predicator, callback, iterable, [timeSlice])
+### pp.reject(predicator, callback, array, [timeSlice])
 complement of `pp.filter`
+
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
@@ -359,6 +507,13 @@ pp.reject(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
 ### pp.find(predicator, callback, iterable, [timeSlice])
 lookup match value from iterable.
 
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 
 ```javascript
@@ -373,6 +528,13 @@ pp.find(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
 <a name="any"/>
 ### pp.any(predicator, callback, iterable, [timeSlice])
 `pp.any` is CPS `Array.some`
+
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
@@ -389,6 +551,13 @@ pp.any(cpsOdd, printCallback, [2, 4, 6, 8, 10])
 ### pp.all(predicator, callback, iterable, [timeSlice])
 `pp.all` is CPS `Array.every`
 
+#### Arguments
+
+* predicator(callback, [value, index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 
 ```javascript
@@ -404,6 +573,16 @@ pp.all(cpsOdd, printCallback, [1, 3, 5, 7, 9])
 ### pp.foldl(accumulator, callback, init, array, [timeSlice])
 folding accumulation left(first of array) to right(last of array).
 
+`pp.foldl`'s invocation is _order_
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* init - init value for accumulation
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 ```javascript
 pp.foldl(function(next, r, x) {
@@ -418,6 +597,15 @@ pp.foldl(function(next, r, x) {
 <a name="foldl1"/>
 ### pp.foldl1(accumulator, callback, array, [timeSlice])
 `pp.foldl1` require Array has 1 or more length. use first element from Array as `init` value.
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
+
+#### Example
 
 ```javascript
 pp.foldl1(function(next, r, x) {
@@ -439,6 +627,16 @@ pp.foldl1(function(next, r, x) {
 ### pp.foldr(accumulator, callback, init, array, [timeSlice])
 folding accumulation right(last of array) to left(first of array).
 
+`pp.foldl`'s invocation is _order_
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* init - init value for accumulation
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
+
 #### Example
 
 ```javascript
@@ -454,6 +652,13 @@ pp.foldr(function(next, r, x) {
 <a name="foldr1"/>
 ### pp.foldr1(accumulator, callback, array, [timeSlice])
 `pp.foldr1` require Array has 1 or more length. use last element from Array as `init` value.
+
+#### Arguments
+
+* accumulator(callback, memo, value, [index, iterable]) - iteration procedure
+* callback(error, [somethings...]) - callback for after iteration
+* array - **not Nullable** Array
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 
