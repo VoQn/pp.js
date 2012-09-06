@@ -3,8 +3,8 @@ if typeof require is 'function'
   pp     = require '../lib/pp'
 
 cps_fib = (callback, no_) ->
-  pp.whilist (c) ->
-    c > 0
+  pp.whilist (next, c) ->
+    next null, c > 0
   , (next, c, a, b) ->
     next null, c - 1, b, a + b
   , (error, c, a, b) ->
