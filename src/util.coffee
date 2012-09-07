@@ -45,7 +45,6 @@ __ =
         return
 
     _nextTimeout = (fn) ->
-      timer = null
       if 1 < arguments.length
         args = __.slice.call arguments, 1
         timer = setTimeout ->
