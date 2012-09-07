@@ -23,17 +23,11 @@ metaContext.until_by = (check) ->
       iterator.apply null, memo
       return
 
-    iterate = pp.context
-      func: (after, args) ->
-        test.apply null, after.concat args
-        main
-      args: [[afterCheck]]
-
     main = pp.context
       func: ->
         return if finished
-        iterate.args[1] = memo
-        iterate
+        test.apply null, [afterCheck].concat memo
+        main
 
 contexts.extend
   whilist: metaContext.until_by __.not
