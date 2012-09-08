@@ -16,7 +16,6 @@ module.exports = function(grunt) {
         src: [
           'src/init.coffee',
           'src/util.coffee',
-          'src/context.coffee',
           'src/trampoline.coffee',
           'src/promise.coffee',
           'src/generator.coffee',
