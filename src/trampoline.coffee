@@ -1,22 +1,19 @@
 class Trampoline
   TIME_SLICE = do ->
     slices = {}
-    fpsRate = [240, 120, 60, 30, 25, 15, 1]
-    for rate in fpsRate
-      slices["FPS_#{rate}"] = Math.ceil(1000 / rate) - 1
+    for rate in [240, 120, 75, 60, 45, 30, 27, 15, 1]
+      slices["FPS_#{rate}"] = ~~(1000 / rate)
     slices
 
+  procStack = []
+  timeStack = []
   current   = null
   timeSlice = 0
   timeLimit = 0
-  procStack = []
-  timeStack = []
 
-  getUnixTime = Date.now or -> +new Date
+  getUnixTime = Date.now or -> +new Date()
 
   invoke = ->
-    return if procStack.length < 1
-
     current   = procStack.shift()
     timeSlice = timeStack.shift()
     timeLimit = getUnixTime() + timeSlice
@@ -28,7 +25,8 @@ class Trampoline
       procStack.push current
       timeStack.push timeSlice
 
-    __.defer invoke
+    if procStack.length
+      pp.defer invoke
     return
 
   limitTimeSlice = (timeSlice) ->
@@ -40,10 +38,12 @@ class Trampoline
     requireLength = fn.length
 
     if requireLength < 1
-      proc = fn
+      proc = fn()
     else
       args = __.slice.call arguments, 1, requireLength + 1
-      proc = -> fn.apply null, args
+      proc = fn.apply null, args
+
+    return if typeof proc isnt 'function'
 
     if requireLength < arguments.length
       timeSlice = arguments[requireLength + 1]
@@ -51,7 +51,7 @@ class Trampoline
     procStack.push proc
     timeStack.push limitTimeSlice timeSlice
     if procStack.length is 1
-      invoke()
+      pp.defer invoke
     return
 
   partial = (fn) ->
@@ -67,7 +67,6 @@ class Trampoline
 
   constuctor: ->
   TIME_SLICE: TIME_SLICE
-  getCurrent: -> current
   register:   register
   partial:    partial
 

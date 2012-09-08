@@ -2,30 +2,29 @@ __.extend.call metaContext,
   arrayEachStepBy: (isShouldStep) ->
     makeProc = (iterator, callback, array) ->
       LIMIT = array.length
+      index = count = 0
+      finished = no
 
       if LIMIT < 1
         callback null
         return
 
-      index = 0
-      count = 0
-      finished = no
-
       next = (error) ->
         ++count
-        if not finished and (count >= LIMIT or error or arguments.length > 1)
+        return if finished
+        if count >= LIMIT or error or arguments.length > 1
           finished = yes
-          args = __.slice.call arguments, 1
+          args = if 2 < arguments.length then [] else __.slice.call arguments, 1
           args.unshift error or null
           callback.apply null, args
-          return
+        return
 
-      proc = ->
+      main = ->
         return if finished
         if isShouldStep index, LIMIT, count
           iterator next, array[index], index, array
           ++index
-        proc
+        main
 
   hashEachBy: (eachProc) ->
     makeProc = (iterator, callback, hash) ->

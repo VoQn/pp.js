@@ -13,18 +13,22 @@ metaContext.until_by = (check) ->
         memo = __.slice.call arguments, 1
       return
 
-    afterCheck = (error, result) ->
+    afterTest = (error, result) ->
       if check result
         finished = yes
-        callback.apply null, [null].concat memo
+        memo.unshift null
+        callback.apply null, memo
         return
-      iterator.apply null, [next].concat memo
+      memo.unshift next
+      iterator.apply null, memo
       return
 
-    proc = ->
+    mainArgs = [afterTest]
+
+    main = ->
       return if finished
-      test.apply null, [afterCheck].concat memo
-      proc
+      test.apply null, mainArgs.concat memo
+      main
 
 contexts.extend
   whilist: metaContext.until_by __.not

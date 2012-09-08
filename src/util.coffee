@@ -46,10 +46,19 @@ __ =
 
     _nextTimeout = (fn) ->
       if 1 < arguments.length
-        setTimeout.apply null, [fn, 0].concat __.slice.call arguments, 1
+        args = __.slice.call arguments, 1
+        timer = setTimeout ->
+          clearTimeout timer
+          fn.apply null, args
+          return
+        , 0
         return
       else
-        setTimeout fn, 0
+        timer = setTimeout ->
+          clearTimeout timer
+          fn()
+          return
+        , 0
         return
 
     if typeof process isnt 'undefined' and typeof process.nextTick is 'function'
