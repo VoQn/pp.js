@@ -194,15 +194,16 @@ afterTest = ->
 
 console.time allTest
 
-for name, index in testNames
-  runner = _iterator_tests[name]
+do ->
+  for name, index in testNames
+    runner = _iterator_tests[name]
 
-  console.log """
-    \u001b[36m#{name} - start -- #{_time_expr _start_time}\u001b[0m
-    """
+    console.log """
+      \u001b[36m#{name} - start -- #{_time_expr _start_time}\u001b[0m
+      """
 
-  runner.func runnerByType(runner.type, name, runner.iter),
-    runnerCallback(name, Date.now(), afterTest),
-    bigArray,
-    frameRate
+    runner.func runnerByType(runner.type, name, runner.iter),
+      runnerCallback(name, Date.now(), afterTest),
+      bigArray,
+      frameRate
 
