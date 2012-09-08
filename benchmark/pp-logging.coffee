@@ -171,16 +171,15 @@ countTestDone = 0
 
 testNames = Object.keys _iterator_tests
 
-allTest = '\u001b[1mAll iteration test done\u001b[0m'
-
 afterTest = ->
   timeStamp = Date.now()
   return if ++countTestDone < testNames.length
   finished = yes
 
-  console.timeEnd allTest
-
-  msg = ["\u001b[32mresult:"]
+  msg = [ "\u001b[1m",
+    "All iteration test done -- #{_time_expr _start_time}",
+    "\u001b[0m\u001b[32m",
+    "\u001b[32mresult:"]
 
   byLabel = (x) ->
     ~~(x.match(/^#([0-9]+)/i)[1])
@@ -191,8 +190,6 @@ afterTest = ->
 
   msg.push "-----------------------------------------------\u001b[0m"
   console.log msg.join '\n'
-
-console.time allTest
 
 do ->
   for name, index in testNames
