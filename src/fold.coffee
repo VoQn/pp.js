@@ -1,14 +1,15 @@
-__.error.invalidFolding = (apiName, target) ->
-  if not __.isArray target
-    errorMessage = "require Array (Not Null) to folding, but #{typeof target}"
-  else if target.length < 1
-    errorMessage = 'Array length is 0, and without init value'
-  else
-    return
-  __.error.invalidArgument apiName, target, errorMessage
+contexts.extend do ->
 
-__.extend.call metaContext,
-  foldBy: (setIndex) ->
+  validateFoldOne = (name, target) ->
+    if not __.isArray target
+      message = "require Array (Not Null) to folding, but #{typeof target}"
+    else if not target.length
+      message = 'Array length is 0, and without init value'
+    else
+      return
+    __.error.invalidArgument name, target, message
+
+  foldBy = (setIndex) ->
     folding = (iterator, callback, init, array) ->
       memo       = init
       accumulate = null
@@ -28,27 +29,20 @@ __.extend.call metaContext,
 
       contexts._arrayEachOrder fold, after, array
 
-  foldOne: (name, method, fold) ->
+  foldOne = (name, method, fold) ->
     folding = (iterator, receiver, array) ->
-      error = __.error.invalidFolding name, array
-
-      if error
-        receiver error
-        return
+      error = validateFoldOne name, array
+      return receiver error if error
 
       copied = array.slice()
       init = copied[method]()
 
       fold iterator, receiver, init, copied
 
-contexts.extend do ->
-  reverseIndex = (index, limit) ->
-    limit - (index + 1)
+  reverseIndex = (index, limit) -> limit - (index + 1)
 
-  meta      = metaContext
-  foldOne   = meta.foldOne
-  foldLeft  = meta.foldBy __.id
-  foldRight = meta.foldBy reverseIndex
+  foldLeft  = foldBy __.id
+  foldRight = foldBy reverseIndex
 
   foldl:  foldLeft
   foldr:  foldRight

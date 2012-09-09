@@ -1,25 +1,28 @@
-metaContext.logical = (test, wrapCallback) ->
-  makeProc = (iterator, receiver, iterable) ->
-    afterCheck = null
-
-    checkIterate = (next, value, key, iterable) ->
-      afterCheck = (error, result) ->
-        if test result
-          next error, value
-        else
-          next error
-        return
-      iterator afterCheck, value, key, iterable
-      return
-
-    contexts.each checkIterate, wrapCallback(receiver), iterable
-
 contexts.extend do ->
-  logical = metaContext.logical
-  judgeByLength = (judge) -> (receiver) -> (error) ->
-    receiver error, judge arguments.length
-    return
+  logical = (test, wrap) ->
+    predicate = (iterator, receiver, iterable) ->
+      afterCheck = null
 
-  any:  logical(__.id, judgeByLength (n) -> n > 1)
-  all:  logical(__.not, judgeByLength (n) -> n < 2)
-  find: logical(__.id, __.id)
+      checkIterate = (next, value, key, iterable) ->
+        afterCheck = (error, result) ->
+          if test result
+          then next error, value
+          else next error
+          return
+        iterator afterCheck, value, key, iterable
+        return
+
+      contexts.each checkIterate, wrap(receiver), iterable
+
+  judgeByLength = (judge) ->
+    wrapper = (receiver) ->
+      callback = (error) ->
+        receiver error, judge arguments.length
+        return
+
+  isHaltLoop = (n) -> n > 1
+  isReachEnd = (n) -> n < 2
+
+  any:  logical __.id, judgeByLength isHaltLoop
+  all:  logical __.not, judgeByLength isReachEnd
+  find: logical __.id, __.id

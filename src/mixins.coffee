@@ -1,16 +1,13 @@
-metaContext =
-  iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
+contexts =
+  _iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
     mixin = (iterator, receiver, iterable) ->
       if __.isPrimitive iterable
-        receiver __.error.invalidArgument mixinName, iterable,
+        return receiver __.error.invalidArgument mixinName, iterable,
           'required Array or Object as HashMap'
-        return
       if __.isArray iterable
-        arrayIterator iterator, receiver, iterable
-      else
-        hashIterator iterator, receiver, iterable
+      then arrayIterator iterator, receiver, iterable
+      else hashIterator iterator, receiver, iterable
 
-contexts =
   extend: (params) ->
     for name, proc of params
       if params.hasOwnProperty name

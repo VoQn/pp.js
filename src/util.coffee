@@ -5,10 +5,7 @@ __ =
         @[key] = value
     @
 
-  keys: Object.keys or (any) ->
-    key for key of any
-
-  slice: Array::slice
+  keys: Object.keys or (any) -> key for key of any
 
   isPrimitive: (any) ->
     switch typeof any
@@ -27,44 +24,28 @@ __ =
     new Inherit()
 
   nothing: ->
-
   id: (x) -> x
-
   not: (x) -> not x
 
   defer: do ->
-    _nextTick = (fn) ->
-      if 1 < arguments.length
-        args = __.slice.call arguments, 1
-        process.nextTick () ->
-          fn.apply null, args
-          return
+    nextTick = (fn, args...) ->
+      process.nextTick ->
+        fn.apply null, args
         return
-      else
-        process.nextTick fn
-        return
+      return
 
-    _nextTimeout = (fn) ->
-      if 1 < arguments.length
-        args = __.slice.call arguments, 1
-        timer = setTimeout ->
-          clearTimeout timer
-          fn.apply null, args
-          return
-        , 0
+    nextTimeout = (fn, args...) ->
+      timer = setTimeout ->
+        clearTimeout timer
+        fn.apply null, args
         return
-      else
-        timer = setTimeout ->
-          clearTimeout timer
-          fn()
-          return
-        , 0
-        return
+      , 0
+      return
 
     if typeof process isnt 'undefined' and typeof process.nextTick is 'function'
-      _nextTick
+      nextTick
     else
-      _nextTimeout
+      nextTimeout
 
   error:
     invalidArgument: (api_name, any, message) ->
