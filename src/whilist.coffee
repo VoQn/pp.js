@@ -1,7 +1,7 @@
-contexts.extend do ->
+pp.extend (util) ->
   untilBy = (check) ->
     cpsLoop = (test, iterator, callback, init) ->
-      memo = if __.isArray init then init.slice() else []
+      memo = if util.isArray init then init.slice() else []
       finished = no
 
       next = (error, args...) ->
@@ -9,8 +9,8 @@ contexts.extend do ->
         if error
           finished = yes
           callback error
-        else
-          memo = args if args.length
+          return
+        memo = args if args.length
         return
 
       afterTest = (error, result) ->
@@ -18,9 +18,9 @@ contexts.extend do ->
           finished = yes
           memo.unshift error or null
           callback.apply null, memo
-        else
-          memo.unshift next
-          iterator.apply null, memo
+          return
+        memo.unshift next
+        iterator.apply null, memo
         return
 
       mainArgs = [afterTest]
@@ -30,5 +30,5 @@ contexts.extend do ->
         test.apply null, mainArgs.concat memo
         main
 
-  whilist: untilBy __.not
-  until:   untilBy __.id
+  whilist: untilBy util.not
+  until:   untilBy util.id

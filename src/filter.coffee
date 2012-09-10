@@ -1,4 +1,6 @@
-contexts.extend do ->
+pp.extend (util) ->
+  forEach = util.arrayEachOrder
+
   filterBy = (tester) ->
     cpsFilter = (iterator, callback, array) ->
       stackMatched = []
@@ -16,7 +18,7 @@ contexts.extend do ->
         callback error, stackMatched
         return
 
-      contexts._arrayEachOrder filter, after, array
+      forEach filter, after, array
 
-  filter: filterBy __.id
-  reject: filterBy __.not
+  filter: filterBy util.id
+  reject: filterBy util.not

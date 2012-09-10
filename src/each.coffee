@@ -1,8 +1,8 @@
-contexts.extend do ->
+pp.extend (util) ->
   arrayEachStepBy = (isShouldStep) ->
     cpsEach = (iterator, callback, array) ->
       limit = array.length
-      return callback null if limit < 1
+      return callback null unless limit
 
       index = count = 0
       finished = no
@@ -23,17 +23,17 @@ contexts.extend do ->
           ++index
         main
 
-  hashEachBy = (eachProc) ->
+  hashEachBy = (forEach) ->
     cpsEach  = (iterator, callback, hash) ->
       hashIterator = (next, key, index, keys) ->
         iterator next, hash[key], key, hash
         return
-      eachProc hashIterator, callback, __.keys hash
+      forEach hashIterator, callback, util.keys hash
 
   toLimit      = (index, limit) -> index < limit
   waitCallback = (index, limit, count) -> index < limit and index <= count
 
-  mixin = contexts._iteratorMixin
+  mixin = util.iteratorMixin
   fill  = arrayEachStepBy toLimit
   order = arrayEachStepBy waitCallback
 

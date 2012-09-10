@@ -3,7 +3,7 @@ class Generator
     @continuation = continuation
 
   next: (success) ->
-    success = __.id if typeof success isnt 'function'
+    success = internal.id if typeof success isnt 'function'
 
     @continuation (next, args...) ->
       @continuation = next

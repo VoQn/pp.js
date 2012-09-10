@@ -1,20 +1,12 @@
-contexts.extend do ->
-
-  validateFoldOne = (name, target) ->
-    if not __.isArray target
-      message = "require Array (Not Null) to folding, but #{typeof target}"
-    else if not target.length
-      message = 'Array length is 0, and without init value'
-    else
-      return
-    __.error.invalidArgument name, target, message
+pp.extend (util) ->
+  forEach = util.arrayEachOrder
 
   foldBy = (setIndex) ->
-    folding = (iterator, callback, init, array) ->
+    cpsFold = (iterator, callback, init, array) ->
       memo       = init
       accumulate = null
 
-      fold = (next, value, index, iterable) ->
+      folding = (next, value, index, iterable) ->
         index = setIndex index, iterable.length
         accumulate = (error, result) ->
           memo = result
@@ -27,7 +19,16 @@ contexts.extend do ->
         callback error, memo
         return
 
-      contexts._arrayEachOrder fold, after, array
+      forEach folding, after, array
+
+  validateFoldOne = (name, target) ->
+    if not util.isArray target
+      message = "require Array (Not Null) to folding, but #{typeof target}"
+    else if not target.length
+      message = 'Array length is 0, and without init value'
+    else
+      return
+    util.invalidArgumentError name, target, message
 
   foldOne = (name, method, fold) ->
     folding = (iterator, receiver, array) ->
@@ -41,7 +42,7 @@ contexts.extend do ->
 
   reverseIndex = (index, limit) -> limit - (index + 1)
 
-  foldLeft  = foldBy __.id
+  foldLeft  = foldBy util.id
   foldRight = foldBy reverseIndex
 
   foldl:  foldLeft

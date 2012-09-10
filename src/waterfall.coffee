@@ -26,7 +26,7 @@ pp.iterator = (procs) ->
 
   procByIndex 0
 
-pp.waterfall = (procs, callback = __.id) ->
+pp.waterfall = (procs, callback = internal.id) ->
   return callback() unless procs.length
 
   finished = no
@@ -45,10 +45,10 @@ pp.waterfall = (procs, callback = __.id) ->
         return
       next = iterator.next()
       args.unshift if next then wrap next else whenEnd
-      __.defer ->
+      pp.defer ->
         iterator.apply iterator, args
         return
       return
 
-  __.defer wrap pp.iterator procs
+  pp.defer wrap pp.iterator procs
   return

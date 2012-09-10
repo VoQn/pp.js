@@ -1,11 +1,12 @@
+root = @
 pp = {}
-old = @pp
+old = root.pp
 
-if typeof module isnt 'undefined'
+if typeof module is 'object'
   module.exports = pp
 else
-  @pp = pp
+  root.pp = pp
 
 pp.noConflict = () ->
-  @pp = old
+  root.pp = old
   pp

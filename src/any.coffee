@@ -1,4 +1,4 @@
-contexts.extend do ->
+pp.extend (util) ->
   logical = (test, wrap) ->
     predicate = (iterator, receiver, iterable) ->
       afterCheck = null
@@ -6,13 +6,14 @@ contexts.extend do ->
       checkIterate = (next, value, key, iterable) ->
         afterCheck = (error, result) ->
           if test result
-          then next error, value
-          else next error
+            next error, value
+          else
+            next error
           return
         iterator afterCheck, value, key, iterable
         return
 
-      contexts.each checkIterate, wrap(receiver), iterable
+      util.each checkIterate, wrap(receiver), iterable
 
   judgeByLength = (judge) ->
     wrapper = (receiver) ->
@@ -23,6 +24,6 @@ contexts.extend do ->
   isHaltLoop = (n) -> n > 1
   isReachEnd = (n) -> n < 2
 
-  any:  logical __.id, judgeByLength isHaltLoop
-  all:  logical __.not, judgeByLength isReachEnd
-  find: logical __.id, __.id
+  any:  logical util.id,  judgeByLength isHaltLoop
+  all:  logical util.not, judgeByLength isReachEnd
+  find: logical util.id,  util.id

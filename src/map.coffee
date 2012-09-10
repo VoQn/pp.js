@@ -1,5 +1,5 @@
-contexts.extend do ->
-  arrayMapBy = (eachProc) ->
+pp.extend (util) ->
+  arrayMapBy = (forEach) ->
     cpsMap = (iterator, callback, array) ->
       modified   = []
       pushResult = null
@@ -16,11 +16,11 @@ contexts.extend do ->
         callback error, modified
         return
 
-      eachProc mapping, after, array
+      forEach mapping, after, array
 
-  hashMapBy = (eachProc) ->
+  hashMapBy = (forEach) ->
     cpsMap = (iterator, callback, hash) ->
-      modified  = __.inherit hash
+      modified  = util.inherit hash
       putResult = null
 
       mapping = (next, key, index, keys) ->
@@ -35,11 +35,11 @@ contexts.extend do ->
         callback error, modified
         return
 
-      eachProc mapping, after, __.keys hash
+      forEach mapping, after, util.keys hash
 
-  mixin    = contexts._iteratorMixin
-  fill     = contexts._arrayEachFill
-  order    = contexts._arrayEachOrder
+  mixin = util.iteratorMixin
+  fill  = util.arrayEachFill
+  order = util.arrayEachOrder
 
   map:      mixin 'pp#map',      arrayMapBy(fill),  hashMapBy fill
   mapOrder: mixin 'pp#mapOrder', arrayMapBy(order), hashMapBy order
