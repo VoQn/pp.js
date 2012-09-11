@@ -1,19 +1,32 @@
 pp.extend (util) ->
-  logical = (test, wrap) ->
-    predicate = (iterator, receiver, iterable) ->
+  logical = (name, test, wrap) ->
+    arrayCheck = (iterator, receiver, array) ->
       afterCheck = null
 
-      checkIterate = (next, value, key, iterable) ->
+      checkIterate = (next, value, index, iterable) ->
         afterCheck = (error, result) ->
           if test result
-            next error, value
-          else
-            next error
+            next error, value, index
+            return
+          next error
           return
-        iterator afterCheck, value, key, iterable
+        iterator afterCheck, value, index, iterable
         return
+      util.arrayEachFill checkIterate, wrap(receiver), array
 
-      util.each checkIterate, wrap(receiver), iterable
+    hashCheck = (iterator, receiver, hash) ->
+      afterCheck = null
+      checkIterate = (next, key, index, keys) ->
+        afterCheck = (error, result) ->
+          if test result
+            next error, hash[key], key
+            return
+          next error
+          return
+        iterator afterCheck, hash[key], key, hash
+        return
+      util.arrayEachFill checkIterate, wrap(receiver), util.keys hash
+    util.iteratorMixin name, arrayCheck, hashCheck
 
   judgeByLength = (judge) ->
     wrapper = (receiver) ->
@@ -24,6 +37,7 @@ pp.extend (util) ->
   isHaltLoop = (n) -> n > 1
   isReachEnd = (n) -> n < 2
 
-  any:  logical util.id,  judgeByLength isHaltLoop
-  all:  logical util.not, judgeByLength isReachEnd
-  find: logical util.id,  util.id
+  util.trampolines
+    any:  logical 'pp#any',  util.id,  judgeByLength isHaltLoop
+    all:  logical 'pp#all',  util.not, judgeByLength isReachEnd
+    find: logical 'pp#find', util.id,  util.id

@@ -1,9 +1,9 @@
-class Promise
+pp.extend (util) ->
   UNRESOULVED = 'unresolved'
   RESOLVED    = 'resolved'
   REJECTED    = 'rejected'
 
-  fire = trampoline.partial (promise, value) ->
+  fire = pp.trampoline (promise, value) ->
     promise.result = value
 
     main = ->
@@ -20,36 +20,34 @@ class Promise
           promise.result = error
       main
 
-  constructor: (scope) ->
-    @state = UNRESOULVED
-    @stack = []
-    @scope = scope or null
+  class Promise
+    constructor: (scope) ->
+      @state = UNRESOULVED
+      @stack = []
+      @scope = scope or null
 
-  STATE:
-    UNRESOULVED: UNRESOULVED
-    RESOLVED: RESOLVED
-    REJECTED: REJECTED
+    STATE:
+      UNRESOULVED: UNRESOULVED
+      RESOLVED: RESOLVED
+      REJECTED: REJECTED
 
-  resolve: (value) ->
-    fire @, value
-    @
+    resolve: (value) ->
+      fire @, value
+      @
 
-  reject: (value) ->
-    @state = REJECTED
-    fire @, value
-    @
+    reject: (value) ->
+      @state = REJECTED
+      fire @, value
+      @
 
-  isResolved: ->
-    @state is RESOLVED
+    isResolved: -> @state is RESOLVED
 
-  isRejected: ->
-    @state is REJECTED
+    isRejected: -> @state is REJECTED
 
-  then: (success, fail, progress) ->
-    @stack.push [success or null, fail or null, progress or null]
-    fire @, null if @state isnt UNRESOULVED
-    @
+    then: (success, fail, progress) ->
+      @stack.push [success or null, fail or null, progress or null]
+      fire @, null if @state isnt UNRESOULVED
+      @
 
-pp.promise = (scope) ->
-  new Promise scope
-
+  promise: (scope) ->
+    new Promise scope

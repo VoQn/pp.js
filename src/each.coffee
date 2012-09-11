@@ -1,43 +1,50 @@
 pp.extend (util) ->
-  arrayEachStepBy = (isShouldStep) ->
-    cpsEach = (iterator, callback, array) ->
-      limit = array.length
-      return callback null unless limit
+  forEachStepBy = (name, step) ->
+    arrayForEach = (iterator, callback, array) ->
+        limit = array.length
+        return callback null unless limit
 
-      index = count = 0
-      finished = no
+        index = count = 0
+        finished = no
 
-      next = (error, args...) ->
-        ++count
-        return if finished
-        if count >= limit or error or args.length
-          finished = yes
-          args.unshift error or null
-          callback.apply null, args
-        return
+        next = (error, args...) ->
+          ++count
+          return if finished
+          if count >= limit or error or args.length
+            finished = yes
+            args.unshift error or null
+            callback.apply null, args
+          return
 
-      main = ->
-        return if finished
-        if isShouldStep index, limit, count
-          iterator next, array[index], index, array
-          ++index
-        main
+        main = ->
+          return if finished
+          if step index, limit, count
+            iterator next, array[index], index, array
+            ++index
+          main
 
-  hashEachBy = (forEach) ->
-    cpsEach  = (iterator, callback, hash) ->
-      hashIterator = (next, key, index, keys) ->
-        iterator next, hash[key], key, hash
-        return
-      forEach hashIterator, callback, util.keys hash
+    hashForEach = (iterator, callback, hash) =>
+        hashIterator = (next, key, index, keys) ->
+          iterator next, hash[key], key, hash
+          return
+        arrayForEach hashIterator, callback, util.keys hash
 
-  toLimit      = (index, limit) -> index < limit
-  waitCallback = (index, limit, count) -> index < limit and index <= count
+    array: arrayForEach
+    hash:  hashForEach
+    mixin: util.iteratorMixin name, arrayForEach, hashForEach
 
-  mixin = util.iteratorMixin
-  fill  = arrayEachStepBy toLimit
-  order = arrayEachStepBy waitCallback
+  toLimit = (index, limit) ->
+    index < limit
 
-  _arrayEachFill:  fill
-  _arrayEachOrder: order
-  each:            mixin 'pp#each', fill, hashEachBy fill
-  eachOrder:       mixin 'pp#eachOrder', order, hashEachBy order
+  waitCallback = (index, limit, count) ->
+    index < limit and index <= count
+
+  forEach =
+    fill: forEachStepBy 'pp#each', toLimit
+    order: forEachStepBy 'pp#eachOrder', waitCallback
+
+  util.trampolines
+    _arrayEachFill:  forEach.fill.array
+    _arrayEachOrder: forEach.order.array
+    each:            forEach.fill.mixin
+    eachOrder:       forEach.order.mixin

@@ -1,4 +1,18 @@
-internal = do ->
+internal  = {}
+
+pp.extend = (contextMaker) ->
+  reference =
+    if typeof contextMaker is 'function'
+    then contextMaker internal
+    else contextMaker
+
+  for own name, proc of reference
+    isInternal = name.match /^_/i
+    internal[if isInternal then name.substring 1 else name] = proc
+    @[name] = proc unless isInternal
+  @
+
+pp.extend (util) ->
 
   isPrimitive = (any) ->
     switch typeof any
@@ -22,10 +36,11 @@ internal = do ->
     , 0
     return
 
-  isPrimitive: isPrimitive
-  isArray: isArray
-  keys: Object.keys or (any) -> key for key of any
-  inherit: Object.create or (any) ->
+  _isPrimitive: isPrimitive
+  _isArray: isArray
+  _keys: Object.keys or (any) ->
+    key for own key of any
+  _inherit: Object.create or (any) ->
     copied = any
     return copied if isPrimitive any
     return any.slice() if isArray any
@@ -33,15 +48,12 @@ internal = do ->
     Inherit = ->
     Inherit.prototype = any.prototype
     new Inherit()
-
-  nothing: ->
-  id: (x) -> x
-  not: (x) -> not x
+  _nothing: ->
+  _id: (x) -> x
+  _not: (x) -> not x
   defer:
     if process and typeof process.nextTick is 'function'
     then nextTick
     else nextTimeout
-  invalidArgumentError: (api_name, any, message) ->
+  _invalidArgumentError: (api_name, any, message) ->
     new TypeError "#{api_name} - Invalid Argument : #{any}\n#{message}"
-
-pp.defer = internal.defer

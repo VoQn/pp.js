@@ -1,4 +1,4 @@
-trampoline = do ->
+pp.extend (util) ->
   TIME_SLICE = do ->
     slices = {}
     for rate in [240, 120, 75, 60, 45, 30, 27, 15, 1]
@@ -32,7 +32,8 @@ trampoline = do ->
     else Math.max timeSlice, TIME_SLICE.FPS_240
 
   TIME_SLICE: TIME_SLICE
-  partial: (fn) ->
+
+  trampoline: (fn) ->
     requireLength = fn.length
     partialized = (args...) ->
       if requireLength <= args.length
@@ -40,7 +41,7 @@ trampoline = do ->
           fn.apply null, args.slice 0, requireLength
         timeStack.push limitTimeSlice(
           if requireLength < args.length
-          then args[requireLength]
+            args[requireLength]
           else 0
         )
         pp.defer invoke if procStack.length is 1
@@ -49,5 +50,3 @@ trampoline = do ->
       apply = (adds...) ->
         return apply if adds.length < 1
         partialized.apply null, args.concat adds
-
-pp.TIME_SLICE = trampoline.TIME_SLICE

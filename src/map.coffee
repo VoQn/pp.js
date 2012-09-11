@@ -41,5 +41,6 @@ pp.extend (util) ->
   fill  = util.arrayEachFill
   order = util.arrayEachOrder
 
-  map:      mixin 'pp#map',      arrayMapBy(fill),  hashMapBy fill
-  mapOrder: mixin 'pp#mapOrder', arrayMapBy(order), hashMapBy order
+  util.trampolines
+    map      : mixin 'pp#map',      arrayMapBy(fill),  hashMapBy fill
+    mapOrder : mixin 'pp#mapOrder', arrayMapBy(order), hashMapBy order

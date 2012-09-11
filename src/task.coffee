@@ -12,5 +12,6 @@ pp.extend (util) ->
         return
       mapping iterator, callback, tasks
 
-  fill:  doTaskBy 'pp#fill',  util.map
-  order: doTaskBy 'pp#order', util.mapOrder
+  util.trampolines
+    fill:  doTaskBy 'pp#fill',  util.map
+    order: doTaskBy 'pp#order', util.mapOrder

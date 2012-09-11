@@ -1,54 +1,48 @@
-pp.iterator = (procs) ->
-  limit = procs.length
-  return unless limit
+pp.extend (util) ->
+  iterator: (procs) ->
+    return unless limit = procs.length
+    cache = []
+    procedureByIndex = (index) ->
+      return cache[index] if index < cache.length
 
-  iteratorCache = []
-
-  procByIndex = (index) ->
-    return iteratorCache[index] if index < iteratorCache.length
-
-    fn = (args...) ->
+      procedure = (args...) ->
         procs[index].apply procs[index], args
-        fn.next()
+        procedure.next()
 
-    fn.next = ->
-      if index < limit - 1
-      then procByIndex index + 1
-      else null
+      procedure.next = ->
+        if index < limit - 1
+          procedureByIndex index + 1
+        else
+          null
 
-    fn.clearCache = ->
-      iteratorCache = []
-      return
-
-    iteratorCache[index] = fn
-
-    fn
-
-  procByIndex 0
-
-pp.waterfall = (procs, callback = internal.id) ->
-  return callback() unless procs.length
-
-  finished = no
-
-  wrap = (iterator) ->
-    whenEnd = (results...) ->
-      callback.apply null, results
-      iterator.clearCache()
-      return
-
-    wrapped = (error, args...) ->
-      return if finished
-      if error
-        finished = yes
-        callback error
+      procedure.clearCache = ->
+        cache = []
         return
-      next = iterator.next()
-      args.unshift if next then wrap next else whenEnd
-      pp.defer ->
-        iterator.apply iterator, args
-        return
-      return
 
-  pp.defer wrap pp.iterator procs
-  return
+      cache[index] = procedure
+      procedure
+    procedureByIndex 0
+
+  waterfall: (procs, callback) ->
+    return callback() unless procs.length
+    finished = no
+    wrap = (iterator) ->
+      whenEnd = (results...) ->
+        callback.apply null, results
+        iterator.clearCache()
+        return
+
+      wrapped = (error, args...) ->
+        return if finished
+        if error
+          finished = yes
+          callback error
+          return
+        pp.defer ->
+          next = iterator.next()
+          args.unshift if next then wrap next else whenEnd
+          iterator.apply iterator, args
+          return
+        return
+    pp.defer wrap pp.iterator procs
+    return
