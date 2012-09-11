@@ -1,26 +1,24 @@
-metaContext =
-  iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
+pp.extend = (contextMaker) ->
+  reference =
+    if typeof contextMaker is 'function'
+    then contextMaker internal
+    else contextMaker
+
+  for own name, proc of reference
+    isInternal = name.match /^_/i
+    internal[if isInternal then name.substring 1 else name] = proc
+    @[name] = trampoline.partial proc unless isInternal
+  @
+
+pp.extend (util) ->
+  _iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
     mixin = (iterator, receiver, iterable) ->
-      if __.isPrimitive iterable
-        receiver __.error.invalidArgument mixinName, iterable,
-          'required Array or Object as HashMap'
+      if util.isPrimitive iterable
+        message = 'required Array or Object as HashMap'
+        receiver util.invalidArgumentError mixinName, iterable, message
         return
-      if __.isArray iterable
+      if util.isArray iterable
         arrayIterator iterator, receiver, iterable
       else
         hashIterator iterator, receiver, iterable
 
-contexts =
-  extend: (params) ->
-    for name, proc of params
-      if params.hasOwnProperty name
-        @[name] = proc
-        pp[name] = trampoline.partial proc unless name.match /^_/i
-    @
-
-pp.extend = (contextMakers) ->
-  for apiName, apiProc of contextMakers
-    if contextMakers.hasOwnProperty name
-      contexts[name] = apiProc
-      @[api_name] = trampoline.partial apiProc
-  @

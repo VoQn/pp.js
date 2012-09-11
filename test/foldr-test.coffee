@@ -21,14 +21,14 @@ buster.testCase 'pp.foldr',
       assert.isNull error
       assert.same result, 2
       done()
-    , 1, [ 1 ]
+    , 1, [1]
 
   'sum of numbers': (done) ->
     pp.foldr add_2_numbers, (error, result) ->
       assert.isNull error
       assert.same result, 15
       done()
-    , 0, [ 1, 2, 3, 4, 5 ]
+    , 0, [1..5]
 
   'accmulate from right side of iterable': (done) ->
     pp.foldr (next, memo, value) ->
@@ -36,9 +36,9 @@ buster.testCase 'pp.foldr',
       next null, memo
     , (error, result) ->
       assert.isNull error
-      assert.equals result, [ 5, 4, 3, 2, 1 ]
+      assert.equals result, [5, 4, 3, 2, 1]
       done()
-    , [], [ 1, 2, 3, 4, 5 ]
+    , [], [1..5]
 
 buster.testCase 'pp.foldr1',
   'when apply array: [], receive invalid error': (done) ->
@@ -53,14 +53,14 @@ buster.testCase 'pp.foldr1',
       assert.isNull error
       assert.same result, 1
       done()
-    , [ 1 ]
+    , [1]
 
   'sum of numbers': (done) ->
     pp.foldr1 add_2_numbers, (error, result) ->
       assert.isNull error
       assert.same result, 15
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
 
   'accmulate from right side of iterable': (done) ->
     pp.foldr1 (next, memo, value) ->
@@ -69,4 +69,4 @@ buster.testCase 'pp.foldr1',
       assert.isNull error
       assert.same result, -5
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]

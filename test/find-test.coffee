@@ -10,7 +10,7 @@ buster.testCase 'pp.find',
       assert.isNull error
       assert.same result, 3
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
 
   'when nothing is match, receive undefined': (done) ->
     pp.find (next, value) ->
@@ -19,4 +19,4 @@ buster.testCase 'pp.find',
       assert.isNull error
       refute.defined result
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]

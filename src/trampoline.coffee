@@ -1,4 +1,4 @@
-class Trampoline
+trampoline = do ->
   TIME_SLICE = do ->
     slices = {}
     for rate in [240, 120, 75, 60, 45, 30, 27, 15, 1]
@@ -7,13 +7,11 @@ class Trampoline
 
   procStack = []
   timeStack = []
-  current   = null
-  timeSlice = 0
-  timeLimit = 0
 
   getUnixTime = Date.now or -> +new Date()
 
   invoke = ->
+    return unless procStack.length
     current   = procStack.shift()
     timeSlice = timeStack.shift()
     timeLimit = getUnixTime() + timeSlice
@@ -25,8 +23,7 @@ class Trampoline
       procStack.push current
       timeStack.push timeSlice
 
-    if procStack.length
-      pp.defer invoke
+    pp.defer invoke
     return
 
   limitTimeSlice = (timeSlice) ->
@@ -34,42 +31,23 @@ class Trampoline
     then TIME_SLICE.FPS_240
     else Math.max timeSlice, TIME_SLICE.FPS_240
 
-  register = (fn) ->
-    requireLength = fn.length
-
-    if requireLength < 1
-      proc = fn()
-    else
-      args = __.slice.call arguments, 1, requireLength + 1
-      proc = fn.apply null, args
-
-    return if typeof proc isnt 'function'
-
-    if requireLength < arguments.length
-      timeSlice = arguments[requireLength + 1]
-
-    procStack.push proc
-    timeStack.push limitTimeSlice timeSlice
-    if procStack.length is 1
-      pp.defer invoke
-    return
-
-  partial = (fn) ->
-    partialized = ->
-      args = if arguments.length then __.slice.call arguments else []
-      if fn.length > args.length
-        partial = ->
-          return partial if arguments.length < 1
-          partialized.apply null, args.concat __.slice.call arguments
-      else
-        args.unshift fn
-        register.apply null, args
-
-  constuctor: ->
   TIME_SLICE: TIME_SLICE
-  register:   register
-  partial:    partial
+  partial: (fn) ->
+    requireLength = fn.length
+    partialized = (args...) ->
+      if requireLength <= args.length
+        procStack.push ->
+          fn.apply null, args.slice 0, requireLength
+        timeStack.push limitTimeSlice(
+          if requireLength < args.length
+          then args[requireLength]
+          else 0
+        )
+        pp.defer invoke if procStack.length is 1
+        return
 
-trampoline = new Trampoline()
+      apply = (adds...) ->
+        return apply if adds.length < 1
+        partialized.apply null, args.concat adds
 
 pp.TIME_SLICE = trampoline.TIME_SLICE

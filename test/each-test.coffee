@@ -21,11 +21,11 @@ buster.testCase 'pp.each',
       assert error instanceof TypeError
       assert.equals error.message, 'require number'
       done()
-    , [ 1, 2, 'not number value', 3, 4 ]
+    , [1, 2, 'not number value', 3, 4]
 
   'each iteration is incremental step': (done) ->
     count = 0
-    params = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+    params = [1..10]
     pp.each (next, value, index) ->
       assert.same index, count
       count++
@@ -37,12 +37,12 @@ buster.testCase 'pp.each',
     , params
 
   '<example> each overwrite values to x^2': (done) ->
-    params = [ 1, 2, 3, 4, 5 ]
+    params = [1..5]
     pp.each (next, value, index, iterable) ->
       iterable[index] = value * value
       next()
     , (error) ->
       expect(error).toBeNull()
-      expect(params).toEqual [ 1, 4, 9, 16, 25 ]
+      expect(params).toEqual [1, 4, 9, 16, 25]
       done()
     , params

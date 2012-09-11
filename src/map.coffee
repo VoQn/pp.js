@@ -1,6 +1,6 @@
-__.extend.call metaContext,
-  arrayMapBy: (eachProc) ->
-    makeProc = (iterator, callback, array) ->
+pp.extend (util) ->
+  arrayMapBy = (forEach) ->
+    cpsMap = (iterator, callback, array) ->
       modified   = []
       pushResult = null
 
@@ -16,16 +16,16 @@ __.extend.call metaContext,
         callback error, modified
         return
 
-      eachProc mapping, after, array
+      forEach mapping, after, array
 
-  hashMapBy: (eachProc) ->
-    makeProc = (iterator, callback, hash) ->
-      modified  = __.inherit hash
+  hashMapBy = (forEach) ->
+    cpsMap = (iterator, callback, hash) ->
+      modified  = util.inherit hash
       putResult = null
 
       mapping = (next, key, index, keys) ->
         putResult = (error, result) ->
-          modified[key] = result
+          modified[key] = result unless error
           next error
           return
         iterator putResult, hash[key], key, hash
@@ -35,15 +35,11 @@ __.extend.call metaContext,
         callback error, modified
         return
 
-      eachProc mapping, after, __.keys hash
+      forEach mapping, after, util.keys hash
 
-contexts.extend do ->
-  meta     = metaContext
-  mixin    = meta.iteratorMixin
-  arrayMap = meta.arrayMapBy
-  hashMap  = meta.hashMapBy
-  fill     = contexts._arrayEachFill
-  order    = contexts._arrayEachOrder
+  mixin = util.iteratorMixin
+  fill  = util.arrayEachFill
+  order = util.arrayEachOrder
 
-  map:      mixin 'pp#map',      arrayMap(fill),  hashMap(fill)
-  mapOrder: mixin 'pp#mapOrder', arrayMap(order), hashMap(order)
+  map:      mixin 'pp#map',      arrayMapBy(fill),  hashMapBy fill
+  mapOrder: mixin 'pp#mapOrder', arrayMapBy(order), hashMapBy order

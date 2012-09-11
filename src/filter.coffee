@@ -1,23 +1,43 @@
-metaContext.filter_by = (tester) ->
-  makeProc = (iterator, callback, array) ->
-    stackMatched = []
-    pushMatched  = null
+pp.extend (util) ->
+  arrayFilterBy = (tester) ->
+    cpsFilter = (iterator, callback, array) ->
+      stackMatched = []
+      pushMatched  = null
 
-    filter = (next, value, index) ->
-      pushMatched = (error, result) ->
-        if not error and tester result
-          stackMatched.push value
-        next error
+      filter = (next, value, index) ->
+        pushMatched = (error, result) ->
+          stackMatched.push value if tester result
+          next error
+          return
+        iterator pushMatched, value, index, array
         return
-      iterator pushMatched, value, index, array
-      return
 
-    after = (error) ->
-      callback error, stackMatched
-      return
+      after = (error) ->
+        callback error, stackMatched
+        return
 
-    contexts._arrayEachOrder filter, after, array
+      util.arrayEachOrder filter, after, array
 
-contexts.extend
-  filter: metaContext.filter_by __.id
-  reject: metaContext.filter_by __.not
+  hashFilterBy = (tester) ->
+    cpsFilter = (iterator, callback, hash) ->
+      modified   = util.inherit hash
+      putMatched = null
+
+      filter = (next, key, index, keys) ->
+        putMatched = (error, result) ->
+          modified[key] = hash[key] if tester result
+          next error
+          return
+        iterator putMatched, hash[key], key, hash
+        return
+
+      after = (error) ->
+        callback error, modified
+        return
+
+      util.arrayEachFill filter, after, util.keys hash
+
+  mixin = util.iteratorMixin
+
+  filter: mixin 'pp#filter', arrayFilterBy(util.id), hashFilterBy(util.id)
+  reject: mixin 'pp#reject', arrayFilterBy(util.not), hashFilterBy(util.not)

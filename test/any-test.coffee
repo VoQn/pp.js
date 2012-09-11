@@ -13,7 +13,7 @@ buster.testCase 'pp.any',
       assert error instanceof TypeError
       assert.same error.message, 'require number'
       done()
-    , [ 1, 2, 'not number', 4, 5 ]
+    , [1, 2, 'not number', 4, 5]
 
   'all element are falsy by test, receive false': (done) ->
     pp.any (next, value) ->
@@ -22,7 +22,7 @@ buster.testCase 'pp.any',
       assert.isNull error
       refute result
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
 
   'some element is true by test, receive true': (done) ->
     pp.any (next, value) ->
@@ -31,7 +31,7 @@ buster.testCase 'pp.any',
       assert.isNull error
       assert result
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
 
 buster.testCase 'pp.all',
   'if invalid case, receive error': (done) ->
@@ -44,7 +44,7 @@ buster.testCase 'pp.all',
       assert error instanceof TypeError
       assert.same error.message, 'require number'
       done()
-    , [ 1, 2, 'not number', 4, 5 ]
+    , [1, 2, 'not number', 4, 5]
 
   'all element are true by test, receive true': (done) ->
     pp.all (next, value) ->
@@ -53,7 +53,7 @@ buster.testCase 'pp.all',
       assert.isNull error
       assert result
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
 
   'some element is falsy by test, receive false': (done) ->
     pp.all (next, value) ->
@@ -62,4 +62,4 @@ buster.testCase 'pp.all',
       assert.isNull error
       refute result
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
