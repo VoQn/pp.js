@@ -21,14 +21,14 @@ buster.testCase 'pp.foldl',
       assert.isNull error
       assert.same result, 2
       done()
-    , 1, [ 1 ]
+    , 1, [1]
 
   'sum of numbers': (done) ->
     pp.foldl add_2_numbers, (error, result) ->
       assert.isNull error
       assert.same result, 15
       done()
-    , 0, [ 1, 2, 3, 4, 5 ]
+    , 0, [1..5]
 
   'accmulate from left side of iterable': (done) ->
     pp.foldl (next, memo, value) ->
@@ -36,9 +36,9 @@ buster.testCase 'pp.foldl',
       next null, memo
     , (error, result) ->
       assert.isNull error
-      assert.equals result, [ 1, 2, 3, 4, 5 ]
+      assert.equals result, [1..5]
       done()
-    , [], [ 1, 2, 3, 4, 5 ]
+    , [], [1..5]
 
 buster.testCase 'pp.foldl1',
   'when apply empty array, callback takes invalid error': (done) ->
@@ -53,14 +53,14 @@ buster.testCase 'pp.foldl1',
       assert.isNull error
       assert.same result, 1
       done()
-    , [ 1 ]
+    , [1]
 
   'sum of numbers': (done) ->
     pp.foldl1 add_2_numbers, (error, result) ->
       assert.isNull error
       assert.same result, 15
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
 
   'accmulate from left side of iterable': (done) ->
     pp.foldl1 (next, memo, value) ->
@@ -69,4 +69,4 @@ buster.testCase 'pp.foldl1',
       assert.isNull error
       assert.same result, -13
       done()
-    , [ 1, 2, 3, 4, 5 ]
+    , [1..5]
