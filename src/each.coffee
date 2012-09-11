@@ -33,11 +33,15 @@ pp.extend (util) ->
     hash:  hashForEach
     mixin: util.iteratorMixin name, arrayForEach, hashForEach
 
+  toLimit = (index, limit) ->
+    index < limit
+
+  waitCallback = (index, limit, count) ->
+    index < limit and index <= count
+
   forEach =
-    fill: forEachStepBy 'pp#each', toLimit = (index, limit) ->
-      index < limit
-    order: forEachStepBy 'pp#eachOrder', waitCallback = (index, limit, count) ->
-      index < limit and index <= count
+    fill: forEachStepBy 'pp#each', toLimit
+    order: forEachStepBy 'pp#eachOrder', waitCallback
 
   util.trampolines
     _arrayEachFill:  forEach.fill.array
