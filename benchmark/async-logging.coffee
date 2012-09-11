@@ -8,6 +8,7 @@ fps = if ARGV.length > 3
   else 60
 
 frameRate = ~~(1000 / fps)
+timeStamp = tmpStamp = 0
 
 console.log """
 \x1b[32mBenchmark - async.js -
@@ -18,12 +19,7 @@ preparing tests ...
 \x1b[0m
 """
 
-bigArray = do ->
-  array = []
-  i = -1
-  while ++i < len
-    array[i] = i + 1
-  array
+bigArray = [1..len]
 
 prettyPrint = (any) ->
   if Array.isArray any
@@ -34,68 +30,28 @@ prettyPrint = (any) ->
   else
     any
 
-_time_expr = (from, opt_to) ->
+timeExpr = (from, opt_to) ->
   to = opt_to or Date.now()
   dt = to - from
   if dt > 6.0e+4
-    "#{(0.5 + dt / 6.0e+4) | 0}m #{(dt % 6.0e+4) / 1.0e+3}s"
+    "#{~~(dt / 6.0e+4)}m #{(dt % 6.0e+4) / 1.0e+3}s"
   else if dt > 1.0e+3
     "#{dt / 1.0e+3}s"
   else
     "#{dt}ms"
 
-finished = no
-
-timeStamp = Date.now()
-
 logging = (f, args...) ->
-  now = Date.now()
-  return if now - timeStamp < frameRate
+  tmpStamp = Date.now()
+  return if tmpStamp - timeStamp < frameRate
   console.log f.apply(null, args)
-  timeStamp = now
+  timeStamp = tmpStamp
 
 labelNowRunning = (runnerName, type, index, delay) ->
   "#{runnerName} - #{type} [#{index}]
    #{if type is 'register' then "(after #{delay}ms)" else ""}
-   -- #{_time_expr _start_time}"
+   -- #{timeExpr startTime}"
 
-randomDelay = (delay_width) ->
-  Math.floor Math.random() * delay_width + 1
-
-taskList = (runnerName) ->
-  makeCallback = (name, index, time_out) ->
-    (next) ->
-      delay = randomDelay time_out
-
-      console.log "\u001b[35m
-        #{labelNowRunning runnerName, 'register', index, delay}
-        \u001b[0m"
-
-      timer = setTimeout ->
-        clearTimeout timer
-        console.log "\u001b[34m
-          #{labelNowRunning runnerName, 'invoke', index, delay}
-          \u001b[0m"
-        next null, name
-      , delay
-
-      [ makeCallback("1st", 0, 1000),
-        makeCallback("2nd", 1, 1000),
-        makeCallback("3rd", 2, 1000),
-        makeCallback("4th", 3, 1000),
-        makeCallback("5th", 4, 1000) ]
-
-doTask = (runner, runnerName) ->
-  runner taskList(runnerName), (error, result) ->
-    console.log "\u001b[35m\u001b[1m##{runnerName} - done
-      -- #{_time_expr _start_time}
-      \n  result >>> #{result}\u001b[0m"
-
-taskRunnerTest = ->
-  doTask async.series, 'async#series '
-  doTask async.parallel, 'async#parallel'
-
-_iterator_tests =
+iterators =
   '#1 async#forEach':
     type: 'iteration'
     func: async.forEach
@@ -127,7 +83,7 @@ _iterator_tests =
 
 runnerByType = (type, name, runner) ->
   nowInvoke = (n, i) ->
-    "\u001b[34m#{n} - running : [#{i}] -- #{_time_expr _start_time}\u001b[0m"
+    "\u001b[34m#{n} - running : [#{i}] -- #{timeExpr startTime}\u001b[0m"
 
   index = -1
   switch type
@@ -143,9 +99,9 @@ runnerByType = (type, name, runner) ->
 callbackByType = (type, name, startAt, after) ->
   if type is 'predicate'
     (result) ->
-      time = _time_expr startAt
+      time = timeExpr startAt
       console.log """
-        \u001b[33m#{name} - done -- #{_time_expr _start_time} (#{time})
+        \u001b[33m#{name} - done -- #{timeExpr startTime} (#{time})
           result >>> #{prettyPrint result}\u001b[0m
         """
       results[name] =
@@ -154,9 +110,9 @@ callbackByType = (type, name, startAt, after) ->
       after()
   else
     (error, result) ->
-      time = _time_expr startAt
+      time = timeExpr startAt
       console.log """
-        \u001b[33m#{name} - done -- #{_time_expr _start_time} (#{time})
+        \u001b[33m#{name} - done -- #{timeExpr startTime} (#{time})
           result >>> #{prettyPrint result}\u001b[0m
         """
       results[name] =
@@ -165,21 +121,19 @@ callbackByType = (type, name, startAt, after) ->
 
       after error
 
-_start_time = Date.now()
 
 results = {}
 
-testNames = Object.keys _iterator_tests
+testNames = Object.keys iterators
 
 countTestDone = 0
 
 afterTest = ->
   timeStamp = Date.now()
   return if ++countTestDone < testNames.length
-  finished = yes
   msg = [
     "\u001b[1m",
-    "All iteration test done -- #{_time_expr _start_time}",
+    "All iteration test done -- #{timeExpr startTime}",
     "\u001b[0m\u001b[32m",
     "result:"
   ]
@@ -191,13 +145,13 @@ afterTest = ->
   msg.push "-----------------------------------------------\u001b[0m"
   console.log msg.join '\n'
 
-for name, index in testNames
-  runner = _iterator_tests[name]
+startTime = Date.now()
 
+for own name, runner of iterators
   console.log """
-    \u001b[36m#{name} - start -- #{_time_expr _start_time}\u001b[0m
+    \u001b[36m#{name} - start -- #{timeExpr startTime}\u001b[0m
     """
-
+  timeStamp = Date.now()
   runner.func bigArray,
     runnerByType(runner.type, name, runner.iter),
-    callbackByType(runner.type, name, Date.now(), afterTest)
+    callbackByType(runner.type, name, timeStamp, afterTest)
