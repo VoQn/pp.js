@@ -1,5 +1,5 @@
 /**
- * @param {Object} grunt .
+ * @param {Object} grunt build system.
  */
 module.exports = function(grunt) {
 
@@ -12,14 +12,24 @@ module.exports = function(grunt) {
       ]
     },
     concat: {
-      dist: {
+      core: {
         src: [
           'src/init.coffee',
           'src/util.coffee',
           'src/trampoline.coffee',
+          'src/mixins.coffee'
+        ],
+        dest: '_temp/pp-core.coffee'
+      },
+      promise: {
+        src: [
           'src/promise.coffee',
-          'src/generator.coffee',
-          'src/mixins.coffee',
+          'src/generator.coffee'
+        ],
+        dest: '_temp/pp-promise.coffee'
+      },
+      collection: {
+        src: [
           'src/each.coffee',
           'src/map.coffee',
           'src/fold.coffee',
@@ -28,6 +38,14 @@ module.exports = function(grunt) {
           'src/whilist.coffee',
           'src/task.coffee',
           'src/waterfall.coffee'
+        ],
+        dest: '_temp/pp-collection.coffee'
+      },
+      full: {
+        src: [
+          '_temp/pp-core.coffee',
+          '_temp/pp-promise.coffee',
+          '_temp/pp-collection.coffee'
         ],
         dest: '_temp/pp.coffee'
       }
@@ -41,9 +59,15 @@ module.exports = function(grunt) {
         }
       }
     },
+    min: {
+      dist: {
+        src: ['lib/pp.js'],
+        dest: 'dist/pp.min.js'
+      }
+    },
     buster: {
       test: {
-        config: './test/buster.js'
+        config: 'test/buster.js'
       }
     },
     watch: {
@@ -53,12 +77,11 @@ module.exports = function(grunt) {
         'test/*.coffee',
         'src/*.coffee'
       ],
-      tasks: 'concat coffee lint buster'
+      tasks: 'concat coffee lint min buster'
     }
   });
 
-  grunt.registerTask('default', 'concat coffee lint buster');
+  grunt.registerTask('default', 'concat coffee lint min buster');
   grunt.loadNpmTasks('grunt-coffee');
   grunt.loadNpmTasks('grunt-buster');
 };
-
