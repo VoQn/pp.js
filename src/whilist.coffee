@@ -30,5 +30,6 @@ pp.extend (util) ->
         test.apply null, mainArgs.concat memo
         main
 
-  whilist: untilBy util.not
-  until:   untilBy util.id
+  util.trampolines
+    whilist: untilBy util.not
+    until:   untilBy util.id

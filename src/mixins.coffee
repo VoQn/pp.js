@@ -1,16 +1,14 @@
-pp.extend = (contextMaker) ->
-  reference =
-    if typeof contextMaker is 'function'
-    then contextMaker internal
-    else contextMaker
-
-  for own name, proc of reference
-    isInternal = name.match /^_/i
-    internal[if isInternal then name.substring 1 else name] = proc
-    @[name] = trampoline.partial proc unless isInternal
-  @
-
 pp.extend (util) ->
+  _trampolines: (procedures) ->
+    trampolines = {}
+    for own name, proc of procedures
+      unless name.match /^_/i
+        trampolines["_#{name}"] = proc
+        trampolines[name]       = util.trampoline proc
+      else
+        trampolines[name] = proc
+    trampolines
+
   _iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
     mixin = (iterator, receiver, iterable) ->
       if util.isPrimitive iterable
@@ -21,4 +19,3 @@ pp.extend (util) ->
         arrayIterator iterator, receiver, iterable
       else
         hashIterator iterator, receiver, iterable
-
