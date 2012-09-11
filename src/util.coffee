@@ -6,7 +6,7 @@ internal = do ->
       else any is null
 
   isArray = Array.isArray or (any) ->
-    Object::toString.call(any) is '[object Array]'
+    toString.call(any) is '[object Array]'
 
   nextTick = (fn, args...) ->
     process.nextTick ->
@@ -29,6 +29,7 @@ internal = do ->
     copied = any
     return copied if isPrimitive any
     return any.slice() if isArray any
+    return {} if toString.call(any) is '[object Object]'
     Inherit = ->
     Inherit.prototype = any.prototype
     new Inherit()
