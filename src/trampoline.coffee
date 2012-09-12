@@ -5,25 +5,14 @@ pp.extend (util) ->
       slices["FPS_#{rate}"] = ~~(1000 / rate)
     slices
 
-  procStack = []
-  timeStack = []
-
   getUnixTime = Date.now or -> +new Date()
 
-  invoke = ->
-    return unless procStack.length
-    current   = procStack.shift()
-    timeSlice = timeStack.shift()
+  invoke = (proc, timeSlice) ->
+    return if typeof proc isnt 'function'
     timeLimit = getUnixTime() + timeSlice
-
-    while typeof current is 'function' and getUnixTime() < timeLimit
-      current = current()
-
-    if typeof current is 'function'
-      procStack.push current
-      timeStack.push timeSlice
-
-    pp.defer invoke
+    while typeof proc is 'function' and getUnixTime() < timeLimit
+      proc = proc()
+    pp.defer invoke, proc, timeSlice
     return
 
   limitTimeSlice = (timeSlice) ->
@@ -37,14 +26,12 @@ pp.extend (util) ->
     requireLength = fn.length
     partialized = (args...) ->
       if requireLength <= args.length
-        procStack.push ->
-          fn.apply null, args.slice 0, requireLength
-        timeStack.push limitTimeSlice(
-          if requireLength < args.length
-            args[requireLength]
-          else 0
-        )
-        pp.defer invoke if procStack.length is 1
+        proc = fn.apply null, args.slice 0, requireLength
+        timeSlice =
+          limitTimeSlice if requireLength < args.length
+          then args[requireLength]
+          else null
+        pp.defer invoke, proc, timeSlice
         return
 
       apply = (adds...) ->
