@@ -8,8 +8,10 @@ pp.extend = (contextMaker) ->
 
   for own name, proc of reference
     isInternal = name.match /^_/i
-    internal[if isInternal then name.substring 1 else name] = proc
-    @[name] = proc unless isInternal
+    if isInternal
+      internal[name.substring 1] = proc
+    else
+      @[name] = proc
   @
 
 pp.extend (util) ->
