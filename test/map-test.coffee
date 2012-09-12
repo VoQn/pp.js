@@ -57,7 +57,7 @@ buster.testCase 'pp.map',
     order  = []
     delay  = 0
     pp.map (next, v, i, it) ->
-      delay = 10 * (it.length - i)
+      delay = 20 * (it.length - i)
       setTimeout ->
         order.push v
         next null, v
