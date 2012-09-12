@@ -1,8 +1,7 @@
 pp.extend (util) ->
   arrayMapBy = (forEach) ->
     cpsMap = (iterator, callback, array) ->
-      modified   = []
-      pushResult = null
+      modified = []
 
       mapping = (next, value, index, iterable) ->
         pushResult = (error, result) ->
@@ -21,7 +20,6 @@ pp.extend (util) ->
   hashMapBy = (forEach) ->
     cpsMap = (iterator, callback, hash) ->
       modified  = util.inherit hash
-      putResult = null
 
       mapping = (next, key, index, keys) ->
         putResult = (error, result) ->

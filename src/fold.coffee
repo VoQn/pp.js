@@ -21,7 +21,6 @@ pp.extend (util) ->
   foldingFrom = (direction) ->
     foldArray = (iterator, callback, init, array) ->
       memo       = init
-      accumulate = null
 
       folding = (next, value, index, iterable) ->
         index = direction.indexChoose index, iterable.length
