@@ -145,13 +145,12 @@ afterTest = ->
   msg.push "-----------------------------------------------\u001b[0m"
   console.log msg.join '\n'
 
-startTime = Date.now()
+startTime = timeStamp = Date.now()
 
 for own name, runner of iterators
   console.log """
     \u001b[36m#{name} - start -- #{timeExpr startTime}\u001b[0m
     """
-  timeStamp = Date.now()
   runner.func bigArray,
     runnerByType(runner.type, name, runner.iter),
-    callbackByType(runner.type, name, timeStamp, afterTest)
+    callbackByType(runner.type, name, Date.now(), afterTest)
