@@ -1,33 +1,32 @@
 pp.extend (util) ->
   forEachStepBy = (name, step) ->
     arrayForEach = (iterator, callback, array) ->
-        limit = array.length
-        return callback null unless limit
+      limit = array.length
+      return callback null unless limit
 
-        index = count = 0
-        finished = no
+      index = count = 0
+      finished = no
 
-        next = (error, args...) ->
-          ++count
-          return if finished
-          if count >= limit or error or args.length
-            finished = yes
-            args.unshift error or null
-            callback.apply null, args
-          return
+      next = (error, args...) ->
+        return if finished
+        if ++count >= limit or error or args.length
+          finished = yes
+          args.unshift error or null
+          callback.apply null, args
+        return
 
-        main = ->
-          return if finished
-          if step index, limit, count
-            iterator next, array[index], index, array
-            ++index
-          main
+      main = ->
+        return if finished
+        if step index, limit, count
+          iterator next, array[index], index, array
+          ++index
+        main
 
     hashForEach = (iterator, callback, hash) =>
-        hashIterator = (next, key, index, keys) ->
-          iterator next, hash[key], key, hash
-          return
-        arrayForEach hashIterator, callback, util.keys hash
+      hashIterator = (next, key, index, keys) ->
+        iterator next, hash[key], key, hash
+        return
+      arrayForEach hashIterator, callback, util.keys hash
 
     array: arrayForEach
     hash:  hashForEach
