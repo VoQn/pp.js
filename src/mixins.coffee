@@ -2,11 +2,11 @@ pp.extend (util) ->
   _trampolines: (procedures) ->
     trampolines = {}
     for own name, proc of procedures
-      unless name.match /^_/i
-        trampolines["_#{name}"] = proc
-        trampolines[name]       = util.trampoline proc
-      else
+      if name.match /^_/i
         trampolines[name] = proc
+      else
+        trampolines["_#{name}"] = proc
+        trampolines[name] = pp.trampoline proc
     trampolines
 
   _iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
