@@ -2,13 +2,13 @@
 
 [![Build Status](https://secure.travis-ci.org/VoQn/pp.js.png)](http://travis-ci.org/VoQn/pp.js)
 
-__pp.js__ calls __pianissimo.js__, meaning _Pseudo-Parallel_, _Passing-Procedure_, _Pretty-Promise_.
-pp.js is javascript library for Asynchronous Collection &amp; Procedure Control Flow.
+__pp.js__ is called __pianissimo.js__, which means _Pseudo-Parallel_, _Passing-Procedure_, or _Pretty-Promise_.
+pp.js is a javascript library for Asynchronous Collection &amp; Procedure Control Flow.
 
-this library inspired by [async.js](https://github.com/caolan/async), [JsDeferred](http://cho45.stfuawsc.com/jsdeferred/), [$.Deferred](http://api.jquery.com/category/deferred-object/), [Promise/A](http://wiki.commonjs.org/wiki/Promises/A).
+this library is inspired by [async.js](https://github.com/caolan/async), [JsDeferred](http://cho45.stfuawsc.com/jsdeferred/), [$.Deferred](http://api.jquery.com/category/deferred-object/), and [Promise/A](http://wiki.commonjs.org/wiki/Promises/A).
 And aiming provide compatible API.
 
-for read this library specification see [Guide](#guide), [Reference](#reference)
+to read this library specification see [Guide](#guide), [Reference](#reference)
 
 ## Faster, Fewer Cost, Parallel multi process
 
