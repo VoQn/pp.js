@@ -10,6 +10,15 @@ And aiming provide compatible API.
 
 for read this library specification see [Guide](#guide), [Reference](#reference)
 
+## Faster, Fewer Cost, Parallel multi process
+
+![Benchmark pp.js vs async.js](https://lh4.googleusercontent.com/-N_dY3EUza5A/UE_932DxeBI/AAAAAAAAAlk/BoI8v5z7r00/s874/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88+2012-09-12+12.12.36.png)
+
++ pp.js faster than async.js (more than 1.25x)
++ pp.js use fewer memory async.js (lower than 1/3)
++ pp.js work looks like parallel (see [Guide/Trampolining](#trampolining))
++ while running pp.js process, It does not block user control as possible as.
+
 ## License
 MIT License. see LICENSE file.
 
@@ -66,9 +75,37 @@ But here is different argument rule, never blocking user thread, never occuring
 <a name="guide"/>
 # Guide
 ## CPS (Continuation Passing Style)
-__pp.js__ is designed by CPS, _Continuation Passing Style_, for effective Asynchronous
-processing.
+__pp.js__ is designed by [CPS](http://en.wikipedia.org/wiki/Continuation-passing_style), _Continuation Passing Style_, for effective Asynchronous processing.
 
+```coffeescript
+# sync procedure
+sq = (x) ->
+  x * x
+
+console.log sq 10 # return 10 * 10 -> 100 -> console.log(100) => IO output
+
+# CPS procedure
+cpsSq = (next, x) ->
+  next x * x
+
+cpsSq console.log, 10 # console.log(10 * 10) -> console.log(100) => IO output
+
+# Async procedure
+heavyProcessing = (callback, parameters) ->
+  # do something (use long time, or network communication)
+  # ...
+  # ...
+  callback error, result # when process done, result apply asynchronouse
+
+heavyProcessing(function(e, r) { # callback
+  if e # receive error
+    # do something
+  else # process has been succeeded
+    # do something
+}, [### parameters ###]);
+```
+
+<a name="trampolining"/>
 ## Trampolining, "Pseudo-Parallel"
 __pp.js__ doesn't provide _true_ parallel processing. Parallel processing is a strictly pseudo.
 This pseudo-parallel processing on [Trampoling](http://en.wikipedia.org/wiki/Trampoline\_\(computing\)).
@@ -155,10 +192,24 @@ pp.order([
   });
 ```
 
-## Type
-A difference between __pp.js__ with __async.js__ is consisting argument format.
+### Difference?
 
-### TimeSlice: number
+``` coffeescript
+pp.fill F, G, H, CALLBACK
+# eval F -> eval G -> eval H -> (wait callback...) -> eval CALLBACK
+
+pp.order F, G, H, CALLBACK
+# eval F -> (wait F callback...) -> eval G -> (wait G callback...) -> ...
+```
+
+Why `pp.fill`'s name is _parallel_ but _fill_? Because it run all procedures and wait until all callback is filling.
+
+`pp.order` is keeping its ordering. When it began run procedure, wait that callback, run next procedure. Until last.
+
+## Type
+One of difference between __pp.js__ with __async.js__ is consisted argument format.
+
+### TimeSlice: number (integer milli-second [0 &lt; t])
 
 `pp.TIME_SLICE` provide consts for frame rate.
 
@@ -168,6 +219,22 @@ A difference between __pp.js__ with __async.js__ is consisting argument format.
 + FPS\_30  - 33ms
 + FPS\_15  - 66ms
 + FPS\_1   -  1s (1000ms)
+
+-------------------------------------------------------------------------------
+
+### Callback: function(?Error, [somethings...])
+__pp.js__ defined __Callback__ type that is `function(Error, [somethings...])`.
+
+first argument, received Error, is accepted as __nullable__.
+
+-------------------------------------------------------------------------------
+
+### Iterable: (!Array | !Object as {string: any})
+__pp.js__ defined __Iterable__ type that is __not null__ Array or Object.
+
+primitive values ... `undefined`, `null`, `string`, `boolean` and `number` aren't accepted.
+
+-------------------------------------------------------------------------------
 
 ### Iterator: function(callback, [somethings...])
 __pp.js__ defined __Iterator__ type that is `function(callback, [somethings...])` 
@@ -219,20 +286,6 @@ var cpsAdd = function(next, memo, value) {
 
 -------------------------------------------------------------------------------
 
-### Callback: function(?Error, [somethings...])
-__pp.js__ defined __Callback__ type that is `function(Error, [somethings...])`.
-
-first argument, received Error, is accepted as __nullable__.
-
--------------------------------------------------------------------------------
-
-### Iterable: (!Array | !Object as {string: any})
-__pp.js__ defined __Iterable__ type that is __not null__ Array or Object.
-
-primitive values ... `undefined`, `null`, `string`, `boolean` and `number` aren't accepted.
-
--------------------------------------------------------------------------------
-
 <a name="reference"/>
 # Referrence
 
@@ -278,11 +331,12 @@ console.log(current); // '2nd'
 -------------------------------------------------------------------------------
 
 <a name="waterfall"/>
-### pp.waterfall(procs, [callback])
+### pp.waterfall(procs, callback, [timeSlice])
 
 #### Arguments
 * procs {Array.&lt;Iterator&gt;} - procedure list
 * callback(error, results...) - callback after iteration
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 ```javascript
@@ -305,17 +359,22 @@ pp.waterfall([
 -------------------------------------------------------------------------------
 
 <a name="whilist"/>
-### pp.whilist(predicator, iterator, callback, [init])
+### pp.whilist(predicator, iterator, callback, init, [timeSlice])
 
 -------------------------------------------------------------------------------
 
 <a name="until"/>
-### pp.until(predicator, iterator, callback, [init])
+### pp.until(predicator, iterator, callback, init, [timeSlice])
 
 -------------------------------------------------------------------------------
 
 <a name="fill"/>
-### pp.fill(procs, [callback])
+### pp.fill(procs, callback, [timeSlice])
+
+#### Arguments
+* procs: Array.&lt;Iterator&gt; task procedure list
+* callback(?Error, Array) callback procedure
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 ```javascript
@@ -346,7 +405,12 @@ pp.fill([
 -------------------------------------------------------------------------------
 
 <a name="order"/>
-### pp.order(procs, [callback])
+### pp.order(procs, callback, [timeSlice])
+
+#### Arguments
+* procs: Array.&lt;Iterator&gt; task procedure list
+* callback(?Error, Array) callback procedure
+* timeSlice - **optional** time slice for iteration loop.
 
 #### Example
 ```javascript
@@ -382,7 +446,7 @@ pp.order([
 
 #### Arguments
 
-* iterator(callback, [value, index, iterable]) - iteration procedure
+* iterator(callback, [value, key, iterable]) - iteration procedure
 * callback(error, [somethings...]) - callback for after iteration
 * iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
@@ -447,14 +511,14 @@ cpsSqMap(console.log, [1, 2, '3', 4, 5]);
 -------------------------------------------------------------------------------
 
 <a name="filter"/>
-### pp.filter(predicator, callback, array, [timeSlice])
+### pp.filter(predicator, callback, iterable, [timeSlice])
 `pp.filter`'s invocation is _order_
 
 #### Arguments
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
 * callback(error, [somethings...]) - callback for after iteration
-* array - **not Nullable** Array
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -477,35 +541,25 @@ pp.filter(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
 //=> [1, 3, 5]
 pp.filter(cpsOdd, printCallback, [2, 4, 6, 8, 10]);
 //=> []
+
+var cpsPrivate = function(next, value, key) {
+  next(null, key.match(/^_/i));
+};
+
+// filtering to hashmap
+pp.filter(cpsPrivate, printCallback, {
+  name: 'John',
+  age: 26,
+  gender: MALE,
+  _hasGirlFriend: true
+}); //=> "{_hasGirlFriend: true}" (o_O)
 ```
 
 -------------------------------------------------------------------------------
 
 <a name="reject"/>
-### pp.reject(predicator, callback, array, [timeSlice])
+### pp.reject(predicator, callback, iterable, [timeSlice])
 complement of `pp.filter`
-
-#### Arguments
-
-* predicator(callback, [value, index, iterable]) - iteration procedure
-* callback(error, [somethings...]) - callback for after iteration
-* array - **not Nullable** Array
-* timeSlice - **optional** time slice for iteration loop.
-
-#### Example
-
-```javascript
-pp.reject(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
-//=> [2, 4]
-pp.reject(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
-//=> [10, 12, 14, 16, 18]
-```
-
--------------------------------------------------------------------------------
-
-<a name="find"/>
-### pp.find(predicator, callback, iterable, [timeSlice])
-lookup match value from iterable.
 
 #### Arguments
 
@@ -517,10 +571,56 @@ lookup match value from iterable.
 #### Example
 
 ```javascript
+pp.reject(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
+//=> [2, 4]
+pp.reject(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
+//=> [10, 12, 14, 16, 18]
+
+// filtering to hashmap
+pp.reject(cpsPrivate, printCallback, {
+  name: 'John',
+  age: 26,
+  gender: MALE,
+  _hasGirlFriend: true
+}); //=> "{name: 'John', age: 26, gender: "male"}" (-_-)
+```
+
+-------------------------------------------------------------------------------
+
+<a name="find"/>
+### pp.find(predicator, callback, iterable, [timeSlice])
+lookup match value from iterable.
+
+#### Arguments
+
+* predicator(callback, [value, key, iterable]) - iteration procedure
+* callback(error, [value, key]) - callback for after iteration
+* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* timeSlice - **optional** time slice for iteration loop.
+
+#### Example
+
+```javascript
 pp.find(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
 //=> 1
 pp.find(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
 //=> undefined
+
+pp.find(function(next, value, key) {
+  next(null, key.match(/^#[a-zA-Z0-9]/i))
+}, function(error, value, key) {
+  console.log('value:', value, 'key:', key);
+}, { // js Object as CSS
+  body: {
+    width: '100%'
+  },
+  '#container': {
+    'background-color': '#eee'
+  },
+  '.notice': {
+    color: '#000'
+  }
+}); //=>value: {'background-color': '#eee'} key: '#container'
 ```
 
 -------------------------------------------------------------------------------
@@ -532,7 +632,7 @@ pp.find(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
 #### Arguments
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
-* callback(error, [somethings...]) - callback for after iteration
+* callback(error, bool, [key]) - callback for after iteration
 * iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
@@ -554,7 +654,7 @@ pp.any(cpsOdd, printCallback, [2, 4, 6, 8, 10])
 #### Arguments
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
-* callback(error, [somethings...]) - callback for after iteration
+* callback(error, bool, [key]) - callback for after iteration
 * iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
