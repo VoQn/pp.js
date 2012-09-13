@@ -19,7 +19,7 @@
     "url": "https://github.com/VoQn/pp.js/blob/master/LICENSE"
   },
   "scripts": {
-    "test": "buster test"
+    "test": "grunt travis"
   },
   "devDependencies": {
     "grunt": "<=0.4",

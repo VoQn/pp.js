@@ -89,6 +89,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('default', 'concat coffee lint min buster');
+  grunt.registerTask('travis', 'buster');
   grunt.loadNpmTasks('grunt-coffee');
   grunt.loadNpmTasks('grunt-buster');
 };
