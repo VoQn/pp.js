@@ -1,49 +1,43 @@
 pp.extend (util) ->
-  forEachStepBy = (name, step) ->
+  stepBy = (step) ->
     arrayForEach = (iterator, callback, array) ->
-      limit = array.length
-      return callback null unless limit
+      return callback null unless array.length
 
       index = count = 0
-      finished = no
-
-      next = (error, args...) ->
+      finished = some = no
+      next = (error) ->
         return if finished
-        if ++count >= limit or error or args.length
-          finished = yes
-          args.unshift error or null
-          callback.apply null, args
+        if error or 1 < arguments.length or ++count >= array.length
+          some = util.slice.call arguments
+          some[0] = error or null
         return
-
       main = ->
         return if finished
-        if step index, limit, count
+        if step index, array.length, count
           iterator next, array[index], index, array
           ++index
+        if some
+          finished = yes
+          callback.apply null, some
         main
 
-    hashForEach = (iterator, callback, hash) =>
-      hashIterator = (next, key, index, keys) ->
-        iterator next, hash[key], key, hash
-        return
-      arrayForEach hashIterator, callback, util.keys hash
-
-    array: arrayForEach
-    hash:  hashForEach
-    mixin: util.iteratorMixin name, arrayForEach, hashForEach
-
-  toLimit = (index, limit) ->
-    index < limit
-
-  waitCallback = (index, limit, count) ->
-    index < limit and index <= count
-
   forEach =
-    fill: forEachStepBy 'pp#each', toLimit
-    order: forEachStepBy 'pp#eachOrder', waitCallback
+    fill: stepBy (index, limit) ->
+      index < limit
+    order: stepBy (index, limit, count) ->
+      index is count and index < limit
+    array: (type) ->
+      @[type]
+    hash: (type) ->
+      hashForEach = (iterator, callback, hash) ->
+        hashIterator = (next, key) ->
+          iterator next, hash[key], key, hash
+          return
+        forEach[type] hashIterator, callback, util.keys hash
+    mixin: (name, type) ->
+      util.iteratorMixin name, @array(type), @hash(type)
 
   util.trampolines
-    _arrayEachFill:  forEach.fill.array
-    _arrayEachOrder: forEach.order.array
-    each:            forEach.fill.mixin
-    eachOrder:       forEach.order.mixin
+    _forEach:  forEach
+    each:      forEach.mixin 'pp#each',      'fill'
+    eachOrder: forEach.mixin 'pp#eachOrder', 'order'
