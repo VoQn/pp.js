@@ -48,3 +48,13 @@ pp.extend (util) ->
       apply = (adds...) ->
         return apply if adds.length < 1
         partialized.apply null, args.concat adds
+
+  _trampolines: (procedures) ->
+    trampolines = {}
+    for own name, proc of procedures
+      if name.match /^_/i
+        trampolines[name] = proc
+      else
+        trampolines["_#{name}"] = proc
+        trampolines[name] = pp.trampoline proc
+    trampolines

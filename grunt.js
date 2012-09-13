@@ -16,8 +16,7 @@ module.exports = function(grunt) {
         src: [
           'src/init.coffee',
           'src/util.coffee',
-          'src/trampoline.coffee',
-          'src/mixins.coffee'
+          'src/trampoline.coffee'
         ],
         dest: '_temp/pp-core.coffee'
       },
@@ -30,6 +29,7 @@ module.exports = function(grunt) {
       },
       collection: {
         src: [
+          'src/mixins.coffee',
           'src/each.coffee',
           'src/map.coffee',
           'src/fold.coffee',
@@ -51,8 +51,15 @@ module.exports = function(grunt) {
       }
     },
     coffee: {
-      'pp': {
+      'lib': {
         dest: 'lib',
+        src: ['_temp/pp.coffee'],
+        options: {
+          bare: true
+        }
+      },
+      'web': {
+        dest: 'dist',
         src: ['_temp/pp.coffee'],
         options: {
           bare: false
@@ -61,7 +68,7 @@ module.exports = function(grunt) {
     },
     min: {
       dist: {
-        src: ['lib/pp.js'],
+        src: ['dist/pp.js'],
         dest: 'dist/pp.min.js'
       }
     },
