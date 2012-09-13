@@ -2,12 +2,13 @@ pp.extend (util) ->
   direction =
     left:
       name: 'pp#foldl'
-      indexChoose: util.id
-      arrayMethod: 'shift'
+      selectIndex: util.id
+      getInit: 'shift'
     right:
       name: 'pp#foldr'
-      indexChoose: (index, limit) -> limit - (index + 1)
-      arrayMethod: 'pop'
+      selectIndex: (index, limit) ->
+        limit - (index + 1)
+      getInit: 'pop'
 
   validateFoldOne = (name, target) ->
     if not util.isArray target
@@ -19,24 +20,24 @@ pp.extend (util) ->
     util.invalidArgumentError name, target, message
 
   foldingFrom = (direction) ->
-    foldArray = (iterator, callback, init, array) ->
-      memo       = init
+    selectIndex = direction.selectIndex
 
+    foldArray = (iterator, callback, init, array) ->
+      memo = init
       folding = (next, value, index, iterable) ->
-        index = direction.indexChoose index, iterable.length
+        index = selectIndex index, iterable.length
         accumulate = (error, result) ->
           memo = result
           next error
           return
         iterator accumulate, memo, iterable[index], index, iterable
         return
-
       after = (error) ->
         callback error, memo
         return
+      util.forEach.order folding, after, array
 
-      util.arrayEachOrder folding, after, array
-
+    getInit = direction.getInit
     fold1Name = direction.name + '1'
 
     withInit: foldArray
@@ -45,8 +46,7 @@ pp.extend (util) ->
         return receiver error if error
 
         copied = array.slice()
-        init = copied[direction.arrayMethod]()
-
+        init = copied[getInit]()
         foldArray iterator, receiver, init, copied
 
   fold =

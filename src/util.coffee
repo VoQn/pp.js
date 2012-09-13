@@ -45,11 +45,12 @@ pp.extend (util) ->
   _inherit: Object.create or (any) ->
     copied = any
     return copied if isPrimitive any
-    return any.slice() if isArray any
+    return [] if isArray any
     return {} if toString.call(any) is '[object Object]'
     Inherit = ->
     Inherit.prototype = any.prototype
     new Inherit()
+  _slice: [].slice
   _nothing: ->
   _id: (x) -> x
   _not: (x) -> not x

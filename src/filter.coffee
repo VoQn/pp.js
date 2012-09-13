@@ -1,37 +1,37 @@
 pp.extend (util) ->
-  filterBy = (name, tester) ->
-    arrayFilter = (iterator, callback, array) ->
-        stackMatched = []
-        pushMatched  = null
-        filter = (next, value, index) ->
-          pushMatched = (error, result) ->
-            stackMatched.push value if tester result
+  filter =
+    array: (tester) ->
+      arrayFilter = (iterator, callback, array) ->
+        matched = []
+        filtering = (next, value, index) ->
+          collect = (error, result) ->
+            matched.push value if tester result
             next error
             return
-          iterator pushMatched, value, index, array
-          return
+          iterator collect, value, index, array
         after = (error) ->
-          callback error, stackMatched
+          callback error, matched
           return
-        util.arrayEachOrder filter, after, array
+        util.forEach.order filtering, after, array
 
-    hashFilter = (iterator, callback, hash) ->
-        modified   = util.inherit hash
-        putMatched = null
-        filter = (next, key, index, keys) ->
-          putMatched = (error, result) ->
-            modified[key] = hash[key] if tester result
+    hash: (tester) ->
+      hashFilter = (iterator, callback, hash) ->
+        matched = {}
+        filtering = (next, key, index, keys) ->
+          collect = (error, result) ->
+            matched[key] = hash[key] if tester result
             next error
             return
-          iterator putMatched, hash[key], key, hash
+          iterator collect, hash[key], key, hash
           return
         after = (error) ->
-          callback error, modified
+          callback error, matched
           return
-        util.arrayEachFill filter, after, util.keys hash
+        util.forEach.order filtering, after, util.keys hash
 
-    util.iteratorMixin name, arrayFilter, hashFilter
+    mixin: (name, tester) ->
+      util.iteratorMixin name, @array(tester), @hash(tester)
 
   util.trampolines
-    filter: filterBy 'pp#filter', util.id
-    reject: filterBy 'pp#reject', util.not
+    filter: filter.mixin 'pp#filter', util.id
+    reject: filter.mixin 'pp#reject', util.not
