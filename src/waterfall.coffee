@@ -9,13 +9,13 @@ pp.extend (util) ->
         procs[index].apply procs[index], args
         procedure.next()
 
-      procedure.next = ->
+      procedure.next = () ->
         if index < limit - 1
           procedureByIndex index + 1
         else
           null
 
-      procedure.clearCache = ->
+      procedure.clearCache = () ->
         cache = []
         return
 
@@ -38,7 +38,7 @@ pp.extend (util) ->
           finished = yes
           callback error
           return
-        pp.defer ->
+        pp.defer () ->
           next = iterator.next()
           args.unshift if next then wrap next else whenEnd
           iterator.apply iterator, args

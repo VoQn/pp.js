@@ -6,7 +6,7 @@ pp.extend (util) ->
   fire = pp.trampoline (promise, value) ->
     promise.result = value
 
-    main = ->
+    main = () ->
       if promise.stack.length < 1
         promise.state = RESOLVED if promise.state isnt REJECTED
         return
@@ -40,9 +40,11 @@ pp.extend (util) ->
       fire @, value
       @
 
-    isResolved: -> @state is RESOLVED
+    isResolved: () ->
+      @state is RESOLVED
 
-    isRejected: -> @state is REJECTED
+    isRejected: () ->
+      @state is REJECTED
 
     then: (success, fail, progress) ->
       @stack.push [success or null, fail or null, progress or null]

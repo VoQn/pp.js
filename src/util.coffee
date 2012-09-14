@@ -7,31 +7,31 @@ pp.extend = (contextMaker) ->
     else contextMaker
 
   for own name, proc of reference
-    isInternal = name.match /^_/i
+    isInternal = name.match /^_/
     if isInternal
       internal[name.substring 1] = proc
     else
       @[name] = proc
-  @
+  @ # return this
 
 pp.extend (util) ->
 
   isPrimitive = (any) ->
     switch typeof any
       when 'undefined', 'boolean', 'number', 'string' then yes
-      else any is null
+      else any is null # NOTE typeof null return 'object'
 
   isArray = Array.isArray or (any) ->
     toString.call(any) is '[object Array]'
 
   nextTick = (fn, args...) ->
-    process.nextTick ->
+    process.nextTick () ->
       fn.apply null, args
       return
     return
 
   nextTimeout = (fn, args...) ->
-    timer = setTimeout ->
+    timer = setTimeout () ->
       clearTimeout timer
       fn.apply null, args
       return
@@ -47,11 +47,11 @@ pp.extend (util) ->
     return copied if isPrimitive any
     return [] if isArray any
     return {} if toString.call(any) is '[object Object]'
-    Inherit = ->
+    Inherit = () -> # Empty function (as plain constructor)
     Inherit.prototype = any.prototype
     new Inherit()
   _slice: [].slice
-  _nothing: ->
+  _nothing: () -> # nothing to do
   _id: (x) -> x
   _not: (x) -> not x
   defer:

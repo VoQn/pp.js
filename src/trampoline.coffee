@@ -1,26 +1,26 @@
 pp.extend (util) ->
-  TIME_SLICE = do ->
+  TIME_SLICE = do () ->
     slices = {}
     for rate in [240, 120, 75, 60, 45, 30, 27, 15, 1]
       slices["FPS_#{rate}"] = ~~(1000 / rate)
     slices
 
   getUnixTime = Date.now or -> +new Date()
-  procsStack  = []
-  timesStack  = []
+  procStack   = []
+  timeStack   = []
 
-  invoke = ->
-    return unless procsStack.length
-    proc  = procsStack.shift()
-    timeSlice = timesStack.shift()
+  invoke = () ->
+    return unless procStack.length
+    procedure = procStack.shift()
+    timeSlice = timeStack.shift()
     timeLimit = getUnixTime() + timeSlice
 
-    while typeof proc is 'function' and getUnixTime() < timeLimit
-      proc = proc()
+    while typeof procedure is 'function' and getUnixTime() < timeLimit
+      procedure = procedure()
 
-    if typeof proc is 'function'
-      procsStack.push proc
-      timesStack.push timeSlice
+    if typeof procedure is 'function'
+      procStack.push procedure
+      timeStack.push timeSlice
 
     pp.defer invoke
     return
@@ -36,13 +36,13 @@ pp.extend (util) ->
     requireLength = fn.length
     partialized = (args...) ->
       if requireLength <= args.length
-        procsStack.push fn.apply null, args.slice 0, requireLength
-        timesStack.push limitTimeSlice(
+        procStack.push fn.apply null, args.slice 0, requireLength
+        timeStack.push limitTimeSlice(
           if requireLength < args.length
           then args[requireLength]
           else null
         )
-        pp.defer invoke if procsStack.length is 1
+        pp.defer invoke if procStack.length is 1
         return
 
       apply = (adds...) ->
@@ -52,7 +52,7 @@ pp.extend (util) ->
   _trampolines: (procedures) ->
     trampolines = {}
     for own name, proc of procedures
-      if name.match /^_/i
+      if name.match /^_/
         trampolines[name] = proc
       else
         trampolines["_#{name}"] = proc

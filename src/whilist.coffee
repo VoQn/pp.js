@@ -25,7 +25,7 @@ pp.extend (util) ->
 
       mainArgs = [afterTest]
 
-      main = ->
+      main = () ->
         return if finished
         test.apply null, mainArgs.concat memo
         main

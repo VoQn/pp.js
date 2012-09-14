@@ -1,24 +1,25 @@
 pp.extend (util) ->
-  stepBy = (step) ->
+  stepBy = (isReady) ->
     arrayForEach = (iterator, callback, array) ->
       return callback null unless array.length
 
       index = count = 0
-      finished = some = no
+      finished = no
+
       next = (error) ->
         return if finished
         if error or 1 < arguments.length or ++count >= array.length
-          some = util.slice.call arguments
-          some[0] = error or null
+          finished = yes
+          args = util.slice.call arguments
+          args[0] = error or null
+          callback.apply null, args
         return
-      main = ->
+
+      main = () ->
         return if finished
-        if step index, array.length, count
+        if isReady(index, array.length, count)
           iterator next, array[index], index, array
           ++index
-        if some
-          finished = yes
-          callback.apply null, some
         main
 
   forEach =
