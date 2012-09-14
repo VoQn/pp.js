@@ -97,12 +97,12 @@ heavyProcessing = (callback, parameters) ->
   # ...
   callback error, result # when process done, result apply asynchronouse
 
-heavyProcessing(function(e, r) { # callback
+heavyProcessing (e, r) -> # callback
   if e # receive error
     # do something
   else # process has been succeeded
     # do something
-}, [### parameters ###]);
+}, [### parameters ###]
 ```
 
 <a name="trampolining"/>
@@ -115,19 +115,19 @@ __pp.js__ API are curried function.
 
 For example, CPS sum of number array is this.
 
-```javascript
-var printSum = pp.foldl(function(next, memo, value) {
-  if(typeof value !== 'number') {
-    next(new TypeError('"folding" require number, but ' + typeof value));
-  } else {
-    next(null, memo + value);
-  }
-}, function(error, result) {
-  console.log(result);
-}, 0); // See it! subject array has not apply!
+```coffeescript
+printSum = pp.foldl (next, memo, value) ->
+  if typeof value isnt 'number'
+    next new TypeError "\"folding\" require number, but #{typeof value}"
+  else
+    next null, memo + value
+  return
+, (error, result) ->
+  console.log result
+}, 0 # See it! subject array has not apply!
 
-printSum([10, 11, 12]); //=> 33
-printSum([1, 2, 3, 4, 5]) //=> 15
+printSum [10, 11, 12] #=> 33
+printSum [1, 2, 3, 4, 5] #=> 15
 ```
 
 ## Invocation type of callback, "fill" and "order"
@@ -139,57 +139,55 @@ Because solve it, pp.js provide two iteration. _fill_ and _order_.
 ### fill
 `fill` process is ASAP (As Soon As Possible)
 
-```javascript
-fireStack = [];
+```coffeescript
+fireStack = []
 
-pp.fill([
-  function(next) {
-    setTimeout(function() {
-      fireStack.push('1st');
-      next(null, '1st');
-    }, 100);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('2nd');
-      next(null, '2nd');
-    }, 200);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('3rd');
-      next(null, '3rd');
-    }, 50)
-  }], function(error, result) {
-    // result     --- ['1st', '2nd', '3rd']
-    // fire_stack --- ['3rd', '1st', '2nd']
-  });
+pp.fill [
+  (next) ->
+    setTimeout ->
+      fireStack.push '1st'
+      next null, '1st'
+    , 100
+  , (next) ->
+    setTimeout ->
+      fireStack.push '2nd'
+      next null, '2nd'
+    , 200
+  , (next) ->
+    setTimeout ->
+      fireStack.push '3rd'
+      next null, '3rd'
+    , 50
+  ], (error, result) ->
+    # result     --- ['1st', '2nd', '3rd']
+    # fire_stack --- ['3rd', '1st', '2nd']
 ```
 
 ### order
 `order` process is keep invocation order.
 
-```javascript
-fireStack = [];
+```coffeescript
+fireStack = []
 
-pp.order([
-  function(next) {
-    setTimeout(function() {
-      fireStack.push('1st');
-      next(null, '1st');
-    }, 100);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('2nd');
-      next(null, '2nd');
-    }, 200);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('3rd');
-      next(null, '3rd');
-    }, 50)
-  }], function(error, result) {
-    // result     --- ['1st', '2nd', '3rd']
-    // fire_stack --- ['1st', '2nd', '3rd']
-  });
+pp.order [
+  (next) ->
+    setTimeout ->
+      fireStack.push '1st'
+      next null, '1st'
+    , 100
+  , (next) ->
+    setTimeout ->
+      fireStack.push '2nd'
+      next null, '2nd'
+    , 200
+  , (next) ->
+    setTimeout ->
+      fireStack.push '3rd'
+      next null, '3rd'
+    , 50
+  ], (error, result) ->
+    # result     --- ['1st', '2nd', '3rd']
+    # fire_stack --- ['1st', '2nd', '3rd']
 ```
 
 ### Difference?
@@ -263,10 +261,9 @@ Specially, predicator passing `boolean` result to callback.
 
 #### Example
 
-```javascript
-var cpsIsEven = function(next, value) {
-  next(null, value % 2 === 0);
-};
+```coffeescript
+cpsIsEven = (next, value) ->
+  next null, value % 2 is 0
 ```
 
 -------------------------------------------------------------------------------
@@ -278,10 +275,9 @@ for accumulate array list.
 
 #### Example
 
-```javascript
-var cpsAdd = function(next, memo, value) {
-  next(null, memo + value);
-};
+```coffeescript
+cpsAdd = (next, memo, value) ->
+  next null, memo + value
 ```
 
 -------------------------------------------------------------------------------
@@ -300,32 +296,29 @@ __|||documentation writing now...|||__
 
 #### Example
 
-```javascript
-var current = '',
-  iter = pp.iterator([
-    function() {
-      current = '1st';
-    },
-    function() {
-      current = '2nd';
-    },
-    function() {
-      current = '3rd';
-    }
-  ]);
+```coffeescript
+current = ''
+iter = pp.iterator [
+  ->
+    current = '1st'
+  , ->
+    current = '2nd'
+  , ->
+    current = '3rd'
+  ]
 
-iter2 = iter();
-console.log(current); // '1st'
+iter2 = iter()
+console.log current # '1st'
 
-iter3 = iter2();
-console.log(current); // '2nd'
+iter3 = iter2()
+console.log current # '2nd'
 
 iter3()
-console.log(current); // '3rd'
+console.log current # '3rd'
 
-iter4 = iter.next();
-iter4();
-console.log(current); // '2nd'
+iter4 = iter.next()
+iter4()
+console.log current # '2nd'
 ```
 
 -------------------------------------------------------------------------------
@@ -339,21 +332,17 @@ console.log(current); // '2nd'
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
-```javascript
-pp.waterfall([
-  function(next) {
-    next(null, 1);
-  },
-  function(next, v) {
-    next(null, v, v * 2); // v:1
-  },
-  function(next, v1, v2);
-    next(null, v1 + v2); // {v1: 1, v2: 2}
-  }
-], function(error, result) {
-  console.log(error === null); // true
-  console.log(result); // 3
-});
+```coffeescript
+pp.waterfall [
+  (next) ->
+    next null, 1
+  , (next, v) ->
+    next null, v, v * 2 # {v: 1}
+  , (next, v1, v2) ->
+    next null, v1 + v2 # {v1: 1, v2: 2}
+  ], (error, result) ->
+    console.log error is null # true
+    console.log result # 3
 ```
 
 -------------------------------------------------------------------------------
@@ -377,29 +366,28 @@ pp.waterfall([
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
-```javascript
-fireStack = [];
+```coffeescript
+fireStack = []
 
-pp.fill([
-  function(next) {
-    setTimeout(function() {
-      fireStack.push('1st');
-      next(null, '1st');
-    }, 100);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('2nd');
-      next(null, '2nd');
-    }, 200);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('3rd');
-      next(null, '3rd');
-    }, 50)
-  }], function(error, result) {
-    // result     --- ['1st', '2nd', '3rd']
-    // fire_stack --- ['3rd', '1st', '2nd']
-  });
+pp.fill [
+  (next) ->
+    setTimeout ->
+      fireStack.push '1st'
+      next null, '1st'
+    , 100
+  , (next) ->
+    setTimeout ->
+      fireStack.push '2nd'
+      next null, '2nd'
+    , 200
+  , (next) ->
+    setTimeout ->
+      fireStack.push '3rd'
+      next null, '3rd'
+    , 50
+  ], (error, result) ->
+    # result     --- ['1st', '2nd', '3rd']
+    # fire_stack --- ['3rd', '1st', '2nd']
 ```
 
 -------------------------------------------------------------------------------
@@ -413,29 +401,28 @@ pp.fill([
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
-```javascript
-fireStack = [];
+```coffeescript
+fireStack = []
 
-pp.order([
-  function(next) {
-    setTimeout(function() {
-      fireStack.push('1st');
-      next(null, '1st');
-    }, 100);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('2nd');
-      next(null, '2nd');
-    }, 200);
-  }, function(next) {
-    setTimeout(function() {
-      fireStack.push('3rd');
-      next(null, '3rd');
-    }, 50)
-  }], function(error, result) {
-    // result     --- ['1st', '2nd', '3rd']
-    // fire_stack --- ['1st', '2nd', '3rd']
-  });
+pp.order [
+  (next) ->
+    setTimeout ->
+      fireStack.push '1st'
+      next null, '1st'
+    , 100
+  , (next) ->
+    setTimeout ->
+      fireStack.push '2nd'
+      next null, '2nd'
+    , 200
+  , (next) ->
+    setTimeout ->
+      fireStack.push '3rd'
+      next null, '3rd'
+    , 50
+  ], (error, result) ->
+    # result     --- ['1st', '2nd', '3rd']
+    # fire_stack --- ['1st', '2nd', '3rd']
 ```
 
 -------------------------------------------------------------------------------
@@ -453,21 +440,20 @@ pp.order([
 
 #### Example
 
-```javascript
-pp.each(function(next, value, index, itrable) {
-    // do something
-    if (errorCondition) {
-      // when it should throw Error, instead of call
-      next(error);
-    } else if (haltCondition) {
-      // when it should halt iteration (purpose has been achieved)
+```coffeescript
+pp.each (next, value, index, itrable) ->
+    # do something
+    if errorCondition
+      # when it should throw Error, instead of call
+      next new Error "error"
+    else if haltCondition
+      # when it should halt iteration (purpose has been achieved)
       next(null, result);
-    } else { // call iteration callback simply
-      next();
-    }
-  }, function(error) {
-    // do something when finish (or halt) iteration
-  }, ['a.coffee', 'b.coffee', 'c.coffee']);
+    else # call iteration callback simply
+      next()
+  , (error) ->
+    # do something when finish (or halt) iteration
+  , ['a.coffee', 'b.coffee', 'c.coffee']
 ```
 
 <a name="eachOrder"/>
@@ -488,20 +474,18 @@ pp.each(function(next, value, index, itrable) {
 
 #### Example
 
-```javascript
-var cpsSqMap = pp.map(function(next, value, index) {
-  if (typeof value !== 'number') {
-    next(new TypeError('cpsSqMap require number array. but include' +
-      typeof value + ' (' + value + ') at [' + index + ']'));
-  } else {
-    next(null, value * value);
-  });
+```coffeescript
+cpsSqMap = pp.map (next, value, index) ->
+  if  typeof value isnt 'number'
+    next new TypeError "cpsSqMap require number array.
+     but include #{typeof value} (#{value}) at [#{index}]"
+  else
+    next null, value * value
 
-cpsSqMap(console.log, [1, 2, 3, 4, 5]);
-//=> null [1, 4, 9, 16, 25]
+cpsSqMap console.log, [1, 2, 3, 4, 5] #=> null [1, 4, 9, 16, 25]
 
-cpsSqMap(console.log, [1, 2, '3', 4, 5]);
-//=> [TypeError: cpsSqMap require number array. but include string (3) at [2]] [ 1, 4 ]
+cpsSqMap console.log, [1, 2, '3', 4, 5]
+#=> [TypeError: cpsSqMap require number array. but include string (3) at [2]] [ 1, 4 ]
 ```
 
 <a name="mapOrder"/>
@@ -523,36 +507,33 @@ cpsSqMap(console.log, [1, 2, '3', 4, 5]);
 
 #### Example
 
-```javascript
-var cpsOdd = function(next, value) {
-  if (typeof value !== 'number') {
-    next(new TypeError('cpsOdd require number array. but include' +
-      typeof value + ' (' + value + ') at [' + index + ']'));
-  } else {
-    next(null, value % 2 === 1); // apply 2nd arg as boolean
-  }
-};
+```coffeescript
+cpsOdd = (next, value) ->
+  if typeof value isnt 'number'
+    next new TypeError "cpsOdd require number array. but include
+     #{typeof value} (#{value}) at [#{index}]"
+  else
+    next null, value % 2 is 1 # apply 2nd arg as boolean
 
-var printCallback = function(error, results) {
-  console.log(error ? error.message : results);
-};
+printCallback = (error, results) ->
+  console.log if error then error.message else results
 
-pp.filter(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
-//=> [1, 3, 5]
-pp.filter(cpsOdd, printCallback, [2, 4, 6, 8, 10]);
-//=> []
+pp.filter cpsOdd, printCallback, [1, 2, 3, 4, 5]
+#=> [1, 3, 5]
 
-var cpsPrivate = function(next, value, key) {
-  next(null, key.match(/^_/i));
-};
+pp.filter cpsOdd, printCallback, [2, 4, 6, 8, 10]
+#=> []
 
-// filtering to hashmap
-pp.filter(cpsPrivate, printCallback, {
-  name: 'John',
-  age: 26,
-  gender: MALE,
-  _hasGirlFriend: true
-}); //=> "{_hasGirlFriend: true}" (o_O)
+cpsPrivate = (next, value, key) ->
+  next null, key.match /^_/
+
+# filtering to hashmap
+pp.filter cpsPrivate, printCallback,
+  name: 'John'
+  age: 26
+  gender: MALE
+  _hasGirlFriend: yes
+#=> "{_hasGirlFriend: true}" (o_O)
 ```
 
 -------------------------------------------------------------------------------
@@ -570,19 +551,20 @@ complement of `pp.filter`
 
 #### Example
 
-```javascript
-pp.reject(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
-//=> [2, 4]
-pp.reject(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
-//=> [10, 12, 14, 16, 18]
+```coffeescript
+pp.reject cpsOdd, printCallback, [1, 2, 3, 4, 5]
+#=> [2, 4]
 
-// filtering to hashmap
-pp.reject(cpsPrivate, printCallback, {
-  name: 'John',
-  age: 26,
-  gender: MALE,
-  _hasGirlFriend: true
-}); //=> "{name: 'John', age: 26, gender: "male"}" (-_-)
+pp.reject cpsOdd, printCallback, [10, 12, 14, 16, 18]
+#=> [10, 12, 14, 16, 18]
+
+# filtering to hashmap
+pp.reject cpsPrivate, printCallback,
+  name: 'John'
+  age: 26
+  gender: MALE
+  _hasGirlFriend: yes
+#=> "{name: 'John', age: 26, gender: "male"}" (-_-)
 ```
 
 -------------------------------------------------------------------------------
@@ -600,27 +582,25 @@ lookup match value from iterable.
 
 #### Example
 
-```javascript
-pp.find(cpsOdd, printCallback, [1, 2, 3, 4, 5]);
-//=> 1
-pp.find(cpsOdd, printCallback, [10, 12, 14, 16, 18]);
-//=> undefined
+```coffeescript
+pp.find cpsOdd, printCallback, [1, 2, 3, 4, 5]
+#=> 1
 
-pp.find(function(next, value, key) {
-  next(null, key.match(/^#[a-zA-Z0-9]/i))
-}, function(error, value, key) {
-  console.log('value:', value, 'key:', key);
-}, { // js Object as CSS
-  body: {
-    width: '100%'
-  },
-  '#container': {
-    'background-color': '#eee'
-  },
-  '.notice': {
-    color: '#000'
-  }
-}); //=>value: {'background-color': '#eee'} key: '#container'
+pp.find cpsOdd, printCallback, [10, 12, 14, 16, 18]
+#=> undefined
+
+pp.find (next, value, key) ->
+    next null, key.match /^#[a-zA-Z0-9]/
+  , (error, value, key) ->
+    console.log "value: #{value}, key: #{key}"
+  , # js Object as CSS
+    body:
+      width: '100%'
+    '#container':
+      'background-color': '#eee'
+    '.notice':
+      color: '#000'
+#=>value: {'background-color': '#eee'} key: '#container'
 ```
 
 -------------------------------------------------------------------------------
@@ -638,11 +618,11 @@ pp.find(function(next, value, key) {
 
 #### Example
 
-```javascript
-pp.any(cpsOdd, printCallback, [0, 2, 5, 8, 10])
-//=> true
-pp.any(cpsOdd, printCallback, [2, 4, 6, 8, 10])
-//=> false
+```coffeescript
+pp.any cpsOdd, printCallback, [0, 2, 5, 8, 10]
+#=> true
+pp.any cpsOdd, printCallback, [2, 4, 6, 8, 10]
+#=> false
 ```
 
 -------------------------------------------------------------------------------
@@ -660,11 +640,11 @@ pp.any(cpsOdd, printCallback, [2, 4, 6, 8, 10])
 
 #### Example
 
-```javascript
-pp.all(cpsOdd, printCallback, [1, 3, 6, 7, 9])
-//=> false
-pp.all(cpsOdd, printCallback, [1, 3, 5, 7, 9])
-//=> true
+```coffeescript
+pp.all cpsOdd, printCallback, [1, 3, 6, 7, 9]
+#=> false
+pp.all cpsOdd, printCallback, [1, 3, 5, 7, 9]
+#=> true
 ```
 
 -------------------------------------------------------------------------------
@@ -684,12 +664,12 @@ folding accumulation left(first of array) to right(last of array).
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
-```javascript
-pp.foldl(function(next, r, x) {
-  next(null, r + x);
-}, function(error, result) {
-  console.log(result);  // => 15
-}, 0, [1, 2, 3, 4, 5]); // 0 + 1 + 2 + 3 + 4 + 5 => 15
+```coffeescript
+pp.foldl (next, r, x) ->
+    next null, r + x
+  , (error, result) ->
+    console.log result # => 15
+  , 0, [1, 2, 3, 4, 5] # 0 + 1 + 2 + 3 + 4 + 5 => 15
 ```
 
 -------------------------------------------------------------------------------
@@ -707,18 +687,18 @@ pp.foldl(function(next, r, x) {
 
 #### Example
 
-```javascript
-pp.foldl1(function(next, r, x) {
-  next(null, r + x);
-}, function(error, result) {
-  console.log(result); // => 15
-}, [1, 2, 3, 4, 5]);   // 1 + 2 + 3 + 4 + 5 => 15
+```coffeescript
+pp.foldl1 (next, r, x) ->
+    next null, r + x
+  , (error, result) ->
+    console.log result # => 15
+  , [1, 2, 3, 4, 5] # 1 + 2 + 3 + 4 + 5 => 15
 
-pp.foldl1(function(next, r, x) {
-  next(null, r + x);
-}, function(error, result) {
-  console.log(error); // => TypeError
-}, []); // empty array :^(
+pp.foldl1 (next, r, x) ->
+    next null, r + x
+  , (error, result) ->
+    console.log error # => TypeError
+  , [] # empty array :^(
 ```
 
 -------------------------------------------------------------------------------
@@ -739,12 +719,12 @@ folding accumulation right(last of array) to left(first of array).
 
 #### Example
 
-```javascript
-pp.foldr(function(next, r, x) {
-  next(null, r + x);
-}, function(error, result) {
-  console.log(result);  // => 15
-}, 0, [1, 2, 3, 4, 5]); // 0 + 5 + 4 + 3 + 2 + 1 => 15
+```coffeescript
+pp.foldr (next, r, x) ->
+    next null, r + x
+  , (error, result) ->
+    console.log result # => 15
+  , 0, [1, 2, 3, 4, 5] # 0 + 5 + 4 + 3 + 2 + 1 => 15
 ```
 
 -------------------------------------------------------------------------------
@@ -763,10 +743,10 @@ pp.foldr(function(next, r, x) {
 #### Example
 
 ```javascript
-pp.foldr1(function(next, r, x) {
-  next(null, r + x);
-}, function(error, result) {
-  console.log(result); // => 15
-}, [1, 2, 3, 4, 5]);   // 5 + 4 + 3 + 2 + 1 => 15
+pp.foldr1 (next, r, x) ->
+    next null, r + x
+  , (error, result) ->
+    console.log result # => 15
+  , [1, 2, 3, 4, 5]   # 5 + 4 + 3 + 2 + 1 => 15
 ```
 
