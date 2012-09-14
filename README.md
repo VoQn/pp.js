@@ -742,7 +742,7 @@ pp.foldr (next, r, x) ->
 
 #### Example
 
-```javascript
+```coffeescript
 pp.foldr1 (next, r, x) ->
   next null, r + x
 , (error, result) ->
