@@ -102,7 +102,7 @@ heavyProcessing (e, r) -> # callback
     # do something
   else # process has been succeeded
     # do something
-}, [### parameters ###]
+, [### parameters ###]
 ```
 
 <a name="trampolining"/>
@@ -124,7 +124,7 @@ printSum = pp.foldl (next, memo, value) ->
   return
 , (error, result) ->
   console.log result
-}, 0 # See it! subject array has not apply!
+, 0 # See it! subject array has not apply!
 
 printSum [10, 11, 12] #=> 33
 printSum [1, 2, 3, 4, 5] #=> 15
@@ -158,9 +158,9 @@ pp.fill [
       fireStack.push '3rd'
       next null, '3rd'
     , 50
-  ], (error, result) ->
-    # result     --- ['1st', '2nd', '3rd']
-    # fire_stack --- ['3rd', '1st', '2nd']
+], (error, result) ->
+  # result     --- ['1st', '2nd', '3rd']
+  # fire_stack --- ['3rd', '1st', '2nd']
 ```
 
 ### order
@@ -185,9 +185,9 @@ pp.order [
       fireStack.push '3rd'
       next null, '3rd'
     , 50
-  ], (error, result) ->
-    # result     --- ['1st', '2nd', '3rd']
-    # fire_stack --- ['1st', '2nd', '3rd']
+], (error, result) ->
+  # result     --- ['1st', '2nd', '3rd']
+  # fire_stack --- ['1st', '2nd', '3rd']
 ```
 
 ### Difference?
@@ -305,7 +305,7 @@ iter = pp.iterator [
     current = '2nd'
   , ->
     current = '3rd'
-  ]
+]
 
 iter2 = iter()
 console.log current # '1st'
@@ -340,9 +340,9 @@ pp.waterfall [
     next null, v, v * 2 # {v: 1}
   , (next, v1, v2) ->
     next null, v1 + v2 # {v1: 1, v2: 2}
-  ], (error, result) ->
-    console.log error is null # true
-    console.log result # 3
+], (error, result) ->
+  console.log error is null # true
+  console.log result # 3
 ```
 
 -------------------------------------------------------------------------------
@@ -385,9 +385,9 @@ pp.fill [
       fireStack.push '3rd'
       next null, '3rd'
     , 50
-  ], (error, result) ->
-    # result     --- ['1st', '2nd', '3rd']
-    # fire_stack --- ['3rd', '1st', '2nd']
+], (error, result) ->
+  # result     --- ['1st', '2nd', '3rd']
+  # fire_stack --- ['3rd', '1st', '2nd']
 ```
 
 -------------------------------------------------------------------------------
@@ -420,9 +420,9 @@ pp.order [
       fireStack.push '3rd'
       next null, '3rd'
     , 50
-  ], (error, result) ->
-    # result     --- ['1st', '2nd', '3rd']
-    # fire_stack --- ['1st', '2nd', '3rd']
+], (error, result) ->
+  # result     --- ['1st', '2nd', '3rd']
+  # fire_stack --- ['1st', '2nd', '3rd']
 ```
 
 -------------------------------------------------------------------------------
@@ -442,18 +442,18 @@ pp.order [
 
 ```coffeescript
 pp.each (next, value, index, itrable) ->
-    # do something
-    if errorCondition
-      # when it should throw Error, instead of call
-      next new Error "error"
-    else if haltCondition
-      # when it should halt iteration (purpose has been achieved)
-      next(null, result);
-    else # call iteration callback simply
-      next()
-  , (error) ->
-    # do something when finish (or halt) iteration
-  , ['a.coffee', 'b.coffee', 'c.coffee']
+  # do something
+  if errorCondition
+    # when it should throw Error, instead of call
+    next new Error "error"
+  else if haltCondition
+    # when it should halt iteration (purpose has been achieved)
+    next(null, result);
+  else # call iteration callback simply
+    next()
+, (error) ->
+  # do something when finish (or halt) iteration
+, ['a.coffee', 'b.coffee', 'c.coffee']
 ```
 
 <a name="eachOrder"/>
@@ -590,16 +590,16 @@ pp.find cpsOdd, printCallback, [10, 12, 14, 16, 18]
 #=> undefined
 
 pp.find (next, value, key) ->
-    next null, key.match /^#[a-zA-Z0-9]/
-  , (error, value, key) ->
-    console.log "value: #{value}, key: #{key}"
-  , # js Object as CSS
-    body:
-      width: '100%'
-    '#container':
-      'background-color': '#eee'
-    '.notice':
-      color: '#000'
+  next null, key.match /^#[a-zA-Z0-9]/
+, (error, value, key) ->
+  console.log "value: #{value}, key: #{key}"
+, # js Object as CSS
+  body:
+    width: '100%'
+  '#container':
+    'background-color': '#eee'
+  '.notice':
+    color: '#000'
 #=>value: {'background-color': '#eee'} key: '#container'
 ```
 
@@ -666,10 +666,10 @@ folding accumulation left(first of array) to right(last of array).
 #### Example
 ```coffeescript
 pp.foldl (next, r, x) ->
-    next null, r + x
-  , (error, result) ->
-    console.log result # => 15
-  , 0, [1, 2, 3, 4, 5] # 0 + 1 + 2 + 3 + 4 + 5 => 15
+  next null, r + x
+, (error, result) ->
+  console.log result # => 15
+, 0, [1, 2, 3, 4, 5] # 0 + 1 + 2 + 3 + 4 + 5 => 15
 ```
 
 -------------------------------------------------------------------------------
@@ -689,16 +689,16 @@ pp.foldl (next, r, x) ->
 
 ```coffeescript
 pp.foldl1 (next, r, x) ->
-    next null, r + x
-  , (error, result) ->
-    console.log result # => 15
-  , [1, 2, 3, 4, 5] # 1 + 2 + 3 + 4 + 5 => 15
+  next null, r + x
+, (error, result) ->
+  console.log result # => 15
+, [1, 2, 3, 4, 5] # 1 + 2 + 3 + 4 + 5 => 15
 
 pp.foldl1 (next, r, x) ->
-    next null, r + x
-  , (error, result) ->
-    console.log error # => TypeError
-  , [] # empty array :^(
+  next null, r + x
+, (error, result) ->
+  console.log error # => TypeError
+, [] # empty array :^(
 ```
 
 -------------------------------------------------------------------------------
@@ -721,10 +721,10 @@ folding accumulation right(last of array) to left(first of array).
 
 ```coffeescript
 pp.foldr (next, r, x) ->
-    next null, r + x
-  , (error, result) ->
-    console.log result # => 15
-  , 0, [1, 2, 3, 4, 5] # 0 + 5 + 4 + 3 + 2 + 1 => 15
+  next null, r + x
+, (error, result) ->
+  console.log result # => 15
+, 0, [1, 2, 3, 4, 5] # 0 + 5 + 4 + 3 + 2 + 1 => 15
 ```
 
 -------------------------------------------------------------------------------
@@ -744,9 +744,9 @@ pp.foldr (next, r, x) ->
 
 ```javascript
 pp.foldr1 (next, r, x) ->
-    next null, r + x
-  , (error, result) ->
-    console.log result # => 15
-  , [1, 2, 3, 4, 5]   # 5 + 4 + 3 + 2 + 1 => 15
+  next null, r + x
+, (error, result) ->
+  console.log result # => 15
+, [1, 2, 3, 4, 5]   # 5 + 4 + 3 + 2 + 1 => 15
 ```
 
