@@ -1,3 +1,6 @@
+
+startTime = timeStamp = tmpStamp = 0
+
 if typeof require is "function"
   async = require 'async'
 
@@ -8,7 +11,6 @@ fps = if ARGV.length > 3
   else 60
 
 frameRate = ~~(1000 / fps)
-timeStamp = tmpStamp = 0
 
 console.log """
 \x1b[32mBenchmark - async.js -
@@ -33,9 +35,9 @@ prettyPrint = (any) ->
 timeExpr = (from, opt_to) ->
   to = opt_to or Date.now()
   dt = to - from
-  if dt > 6.0e+4
+  if dt >= 6.0e+4
     "#{~~(dt / 6.0e+4)}m #{(dt % 6.0e+4) / 1.0e+3}s"
-  else if dt > 1.0e+3
+  else if dt >= 1.0e+3
     "#{dt / 1.0e+3}s"
   else
     "#{dt}ms"
@@ -145,7 +147,8 @@ afterTest = ->
   msg.push "-----------------------------------------------\u001b[0m"
   console.log msg.join '\n'
 
-startTime = timeStamp = Date.now()
+
+startTime = timeStamp = tmpStamp = Date.now()
 
 for own name, runner of iterators
   console.log """
