@@ -3,6 +3,21 @@ if typeof require is 'function'
   pp     = require '../lib/pp'
 
 buster.testCase 'pp.reject',
+  'when receiver isnt function, throw error': (done) ->
+    try
+      pp.reject (next, v) ->
+        next null, no
+      , 'not function', [1..9]
+    catch error
+      assert error instanceof TypeError
+      done()
+
+  'when iterator isnt function, receive error': (done) ->
+    pp.reject 'not function', (error, result) ->
+      assert error instanceof TypeError
+      done()
+    , [1..9]
+
   'rejecting array by predicate': (done) ->
     pp.reject (next, v) ->
       next null, v % 2 < 1

@@ -3,6 +3,21 @@ if typeof require is 'function'
   pp     = require '../lib/pp'
 
 buster.testCase 'pp.any',
+  'when receiver isnt function, throw error': (done) ->
+    try
+      pp.any (next, value) ->
+        next null, no
+      , 'not function', [1..9]
+    catch error
+      assert error instanceof TypeError
+      done()
+
+  'when iterator isnt function, receive error': (done) ->
+    pp.any 'not function', (error, result) ->
+      assert error instanceof TypeError
+      done()
+    , [1..9]
+
   'if invalid case, receive error': (done) ->
     pp.any (next, value, index) ->
       if typeof value isnt 'number'
@@ -34,6 +49,21 @@ buster.testCase 'pp.any',
     , [1..5]
 
 buster.testCase 'pp.all',
+  'when receiver isnt function, throw error': (done) ->
+    try
+      pp.all (next, value) ->
+        next null, no
+      , 'not function', [1..9]
+    catch error
+      assert error instanceof TypeError
+      done()
+
+  'when iterator isnt function, receive error': (done) ->
+    pp.all 'not function', (error, result) ->
+      assert error instanceof TypeError
+      done()
+    , [1..9]
+
   'if invalid case, receive error': (done) ->
     pp.all (next, value) ->
       if typeof value isnt 'number'

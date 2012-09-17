@@ -1,6 +1,15 @@
 pp.extend (util) ->
   util.trampolines
     any: (iterator, receiver, iterable) ->
+      if typeof receiver isnt 'function'
+        message = "callback required function, but #{typeof receiver}"
+        throw util.invalidArgumentError 'pp#any', receiver, message
+        return
+      if typeof iterator isnt 'function'
+        message = "iterator required function, but #{typeof iterator}"
+        receiver util.invalidArgumentError 'pp#any', iterator, message
+        return
+
       check = (next, value, key, iterable) ->
         collect = (error, result) ->
           if result
@@ -21,6 +30,15 @@ pp.extend (util) ->
       util.each check, after, iterable
 
     all: (iterator, receiver, iterable) ->
+      if typeof receiver isnt 'function'
+        message = "callback required function, but #{typeof receiver}"
+        throw util.invalidArgumentError 'pp#all', receiver, message
+        return
+      if typeof iterator isnt 'function'
+        message = "iterator required function, but #{typeof iterator}"
+        receiver util.invalidArgumentError 'pp#all', iterator, message
+        return
+
       check = (next, value, key, iterable) ->
         collect = (error, result) ->
           if result
