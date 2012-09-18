@@ -22,7 +22,7 @@ buster.testCase 'pp.find',
       done()
     , [1..5]
 
-  'find match value and key from hash': (done) ->
+  'find match value and key from hash table': (done) ->
     pp.find (next, value, selector) ->
       next null, selector.match /^#/i
     , (error, css, selector) ->

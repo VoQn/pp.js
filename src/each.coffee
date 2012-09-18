@@ -17,7 +17,7 @@ pp.extend (util) ->
 
       main = () ->
         return if finished
-        if isReady(index, array.length, count)
+        if isReady index, array.length, count
           iterator next, array[index], index, array
           ++index
         main
@@ -30,7 +30,8 @@ pp.extend (util) ->
     array: (type) ->
       @[type]
     hash: (type) ->
-      hashForEach = (iterator, callback, hash) ->
+      return @hash[type] if @hash[type]
+      @hash[type] = (iterator, callback, hash) ->
         hashIterator = (next, key) ->
           iterator next, hash[key], key, hash
           return
