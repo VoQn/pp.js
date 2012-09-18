@@ -1,15 +1,12 @@
 pp.extend (util) ->
-  util.trampolines
-    any: (iterator, receiver, iterable) ->
-      if typeof receiver isnt 'function'
-        message = "callback required function, but #{typeof receiver}"
-        throw util.invalidArgumentError 'pp#any', receiver, message
-        return
-      if typeof iterator isnt 'function'
-        message = "iterator required function, but #{typeof iterator}"
-        receiver util.invalidArgumentError 'pp#any', iterator, message
-        return
+  forEach = (iterator, callback, iterable) ->
+    if util.isArray iterable
+      util.forEach.fill iterator, callback, iterable
+    else
+      util.forEach.hash.fill iterator, callback, iterable
 
+  predicators =
+    any: (iterator, callback, iterable) ->
       check = (next, value, key, iterable) ->
         collect = (error, result) ->
           if result
@@ -22,23 +19,14 @@ pp.extend (util) ->
 
       after = (error, result, key) ->
         if arguments.length < 2
-          receiver error, no
+          callback error, no
         else
-          receiver error, result, key
+          callback error, result, key
         return
 
-      util.each check, after, iterable
+      forEach check, after, iterable
 
-    all: (iterator, receiver, iterable) ->
-      if typeof receiver isnt 'function'
-        message = "callback required function, but #{typeof receiver}"
-        throw util.invalidArgumentError 'pp#all', receiver, message
-        return
-      if typeof iterator isnt 'function'
-        message = "iterator required function, but #{typeof iterator}"
-        receiver util.invalidArgumentError 'pp#all', iterator, message
-        return
-
+    all: (iterator, callback, iterable) ->
       check = (next, value, key, iterable) ->
         collect = (error, result) ->
           if result
@@ -51,14 +39,14 @@ pp.extend (util) ->
 
       after = (error, result, key) ->
         if arguments.length < 2
-          receiver error, yes
+          callback error, yes
         else
-          receiver error, no, key
+          callback error, no, key
         return
 
-      util.each check, after, iterable
+      forEach check, after, iterable
 
-    find: (iterator, receiver, iterable) ->
+    find: (iterator, callback, iterable) ->
       check = (next, value, key, iterable) ->
         collect = (error, result) ->
           if result
@@ -72,9 +60,14 @@ pp.extend (util) ->
 
       after = (error, value, key) ->
         if arguments.length < 2
-          receiver error
+          callback error
         else
-          receiver error, value, key
+          callback error, value, key
         return
 
-      util.each check, after, iterable
+      forEach check, after, iterable
+
+  validates = {}
+  for own name, proc of predicators
+    validates[name] = util.validateIteration "pp##{name}", proc
+  util.trampolines validates

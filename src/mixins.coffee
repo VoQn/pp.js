@@ -1,19 +1,26 @@
 pp.extend (util) ->
-  _iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
-    mixin = (iterator, receiver, iterable) ->
-      if typeof receiver isnt 'function'
-        message = "receiver required function, but #{typeof receiver}"
-        throw util.invalidArgumentError mixinName, receiver, message
+  expectBut = (identifer, expected, actual) ->
+    "#{identifer} required a #{expected}, but #{typeof actual}"
+  _validateIteration: (name, iteration) ->
+    validated = (iterator, callback, iterable) ->
+      argError = util.invalidArgumentError
+
+      if typeof callback isnt 'function'
+        throw argError name, callback
+        , expectBut 'callback', 'function', callback
         return
       if typeof iterator isnt 'function'
-        message = "iterator required function, but #{typeof iterator}"
-        receiver util.invalidArgumentError mixinName, iterator, message
+        callback argError name, iterator
+        , expectBut 'iterator', 'function', iterator
         return
       if util.isPrimitive iterable
-        message = "iterable required Array or Object as HashMap, but #{typeof iterable}"
-        receiver util.invalidArgumentError mixinName, iterable, message
+        callback argError name, iterable
+        , expectBut 'iterable', 'Array or Object (as HashTable)', iterable
         return
+      iteration iterator, callback, iterable
+  _iteratorMixin: (mixinName, arrayIterator, hashIterator) ->
+    mixin = util.validateIteration mixinName, (iterator, callback, iterable) ->
       if util.isArray iterable
-        arrayIterator iterator, receiver, iterable
+        arrayIterator iterator, callback, iterable
       else
-        hashIterator iterator, receiver, iterable
+        hashIterator iterator, callback, iterable
