@@ -45,7 +45,7 @@ buster.testCase 'pp.filter',
       done()
     , [1..5]
 
-  'enable filter for hash map': (done) ->
+  'enable filter for hash table': (done) ->
     pp.filter (next, v, k) ->
       next null, k.match /^_/i
     , (error, result) ->

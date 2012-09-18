@@ -52,7 +52,7 @@ buster.testCase 'pp.map',
       done()
     iteration origin
 
-  'iterate object as hash map': (done) ->
+  'iterate object as hash table': (done) ->
     pp.map (next, v, k) ->
       next null, v * 2
     , (error, result) ->

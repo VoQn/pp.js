@@ -435,7 +435,7 @@ pp.order [
 
 * iterator(callback, [value, key, iterable]) - iteration procedure
 * callback(error, [somethings...]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -469,7 +469,7 @@ pp.each (next, value, index, itrable) ->
 
 * iterator(callback, [value, index, iterable]) - iteration procedure
 * callback(error, [somethings...]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -502,7 +502,7 @@ cpsSqMap console.log, [1, 2, '3', 4, 5]
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
 * callback(error, [somethings...]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -527,7 +527,7 @@ pp.filter cpsOdd, printCallback, [2, 4, 6, 8, 10]
 cpsPrivate = (next, value, key) ->
   next null, key.match /^_/
 
-# filtering to hashmap
+# filtering to hash table
 pp.filter cpsPrivate, printCallback,
   name: 'John'
   age: 26
@@ -546,7 +546,7 @@ complement of `pp.filter`
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
 * callback(error, [somethings...]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -558,7 +558,7 @@ pp.reject cpsOdd, printCallback, [1, 2, 3, 4, 5]
 pp.reject cpsOdd, printCallback, [10, 12, 14, 16, 18]
 #=> [10, 12, 14, 16, 18]
 
-# filtering to hashmap
+# filtering to hashtable
 pp.reject cpsPrivate, printCallback,
   name: 'John'
   age: 26
@@ -577,7 +577,7 @@ lookup match value from iterable.
 
 * predicator(callback, [value, key, iterable]) - iteration procedure
 * callback(error, [value, key]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -613,7 +613,7 @@ pp.find (next, value, key) ->
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
 * callback(error, bool, [key]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
@@ -635,7 +635,7 @@ pp.any cpsOdd, printCallback, [2, 4, 6, 8, 10]
 
 * predicator(callback, [value, index, iterable]) - iteration procedure
 * callback(error, bool, [key]) - callback for after iteration
-* iterable - **not Nullable** Array or Object as HashMap (`{{string: *}}`)
+* iterable - **not Nullable** Array or Object as HashTable (`{{string: *}}`)
 * timeSlice - **optional** time slice for iteration loop.
 
 #### Example
