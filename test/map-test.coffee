@@ -9,6 +9,21 @@ cps_num_id = (next, v) ->
     next null, v
 
 buster.testCase 'pp.map',
+  'when receiver isnt function, throw error': (done) ->
+    try
+      pp.map (next, v) ->
+        next null, v
+      , 'not function', [1..5]
+    catch error
+      assert error instanceof TypeError
+      done()
+
+  'when iterator isnt function, receive error': (done) ->
+    pp.map 'not function', (error, result) ->
+      assert error instanceof TypeError
+      done()
+    , [1..5]
+
   'when array: [], receive []': (done) ->
     pp.map cps_num_id, (error, result) ->
       assert.isNull error
@@ -37,7 +52,7 @@ buster.testCase 'pp.map',
       done()
     iteration origin
 
-  'iterate object as hash map': (done) ->
+  'iterate object as hash table': (done) ->
     pp.map (next, v, k) ->
       next null, v * 2
     , (error, result) ->

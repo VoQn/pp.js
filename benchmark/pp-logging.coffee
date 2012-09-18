@@ -1,3 +1,6 @@
+
+startTime = timeStamp = tmpStamp = 0
+
 if typeof require is "function"
   pp = require '../lib/pp'
 
@@ -30,14 +33,12 @@ prettyPrint = (any) ->
 timeExpr = (from, opt_to) ->
   to = opt_to or Date.now()
   dt = to - from
-  if dt > 6.0e+4
+  if dt >= 6.0e+4
     "#{~~(dt / 6.0e+4)}m #{(dt % 6.0e+4) / 1.0e+3}s"
-  else if dt > 1.0e+3
+  else if dt >= 1.0e+3
     "#{dt / 1.0e+3}s"
   else
     "#{dt}ms"
-
-timeStamp = tmpStamp = 0
 
 logging = (f, args...) ->
   tmpStamp = Date.now()
@@ -133,7 +134,7 @@ afterTest = ->
   msg.push "-----------------------------------------------\u001b[0m"
   console.log msg.join '\n'
 
-startTime = timeStamp = Date.now()
+startTime = timeStamp = tmpStamp = Date.now()
 
 for own name, runner of iterators
   console.log """

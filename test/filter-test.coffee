@@ -3,6 +3,21 @@ if typeof require is 'function'
   pp = require '../lib/pp'
 
 buster.testCase 'pp.filter',
+  'when receiver isnt function, throw error': (done) ->
+    try
+      pp.filter (next, v) ->
+        next null, yes
+      , 'not function', [1..9]
+    catch error
+      assert error instanceof TypeError
+      done()
+
+  'when iterator isnt function, receive error': (done) ->
+    pp.filter 'not function', (error, result) ->
+      assert error instanceof TypeError
+      done()
+    , [1..9]
+
   'filtering array by predicate': (done) ->
     pp.filter (next, v) ->
       next null, v % 2 < 1
@@ -30,7 +45,7 @@ buster.testCase 'pp.filter',
       done()
     , [1..5]
 
-  'enable filter for hash map': (done) ->
+  'enable filter for hash table': (done) ->
     pp.filter (next, v, k) ->
       next null, k.match /^_/i
     , (error, result) ->

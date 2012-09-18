@@ -3,6 +3,22 @@ if typeof require is 'function'
   pp = require '../lib/pp.js'
 
 buster.testCase 'pp.each',
+  'when receiver isnt function case, thorw error': (done) ->
+    try
+      pp.each (next, v) ->
+        next null, v
+      , 0, [1..5]
+      assert no
+    catch error
+      assert error instanceof TypeError
+      done()
+
+  'when iterator isnt function, receive error': (done) ->
+    pp.each 'not function', (error, result) ->
+      assert error instanceof TypeError
+      done()
+    , [1..5]
+
   'when no problem, error is null': (done) ->
     pp.each (next) ->
       next()

@@ -2,14 +2,14 @@ if typeof require is 'function'
   buster = require 'buster'
   pp     = require '../lib/pp'
 
-cps_fib = (callback, no_) ->
+cps_fib = (callback, n) ->
   pp.whilist (next, c) ->
     next null, c > 0
   , (next, c, a, b) ->
     next null, c - 1, b, a + b
   , (error, c, a, b) ->
     callback error, b
-  , [ no_, 1, 0 ]
+  , [ n, 1, 0 ]
 
 buster.testCase 'pp.whilist',
   '<example> fibonacci(10)': (done) ->

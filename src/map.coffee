@@ -35,5 +35,5 @@ pp.extend (util) ->
       util.iteratorMixin name, @arrayMap(forEach), @hashMap(forEach)
 
   util.trampolines
-    map      : map.mixin 'pp#map',      'fill'
-    mapOrder : map.mixin 'pp#mapOrder', 'order'
+    map:      map.mixin 'pp#map',      'fill'
+    mapOrder: map.mixin 'pp#mapOrder', 'order'
