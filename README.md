@@ -35,7 +35,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 + [Promise/A](/VoQn/pp.js/blob/master/doc/promise.md) - Implement [Promise/A](http://wiki.commonjs.org/wiki/Promises/A) of [CommonJS](http://www.commonjs.org/)
 + [Generator](/VoQn/pp.js/blob/master/doc/generator.md) - simple [Generator](http://wiki.ecmascript.org/doku.php?id=harmony:generators) like [ES-Harmony](https://mail.mozilla.org/pipermail/es-discuss/2008-August/006837.html)
 + [Control Flow API](/VoQn/pp.js/blob/master/doc/control_flow_api.md)
-+ [Collection API](/VoQn/pp.js/master/doc/collection_api.md)
++ [Collection API](/VoQn/pp.js/blob/master/doc/collection_api.md)
 
 <a name="guide"/>
 # Guide
