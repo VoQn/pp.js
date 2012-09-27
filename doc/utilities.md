@@ -45,6 +45,14 @@ _pp = pp.noConflict()
 + FPS\_2   - 500ms
 + FPS\_1   -  1s (1000ms)
 
+### Example
+```
+afterOneFrame = (doSomething, scope, args...) ->
+  setTimeout ->
+    doSomething.apply scope, args
+  , pp.TIME_SLICE.FPS_60 # 16ms
+```
+
 <a name="defer"/>
 ## pp.defer(procedure)
 `pp.defer` is so simple. deffering procedure.
@@ -67,6 +75,7 @@ else
 
 <a name="extend"/>
 ## pp.extend(setup)
+`pp.extend` is for **pp.js** plugin.
 
 ### Arguments
 

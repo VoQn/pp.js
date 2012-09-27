@@ -28,20 +28,14 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+<a name="reference"/>
 ## API Reference
 
 + [Utilities](/VoQn/pp.js/blob/master/doc/utilities.md)
-+ [Promise/A]()
-+ [Generator]()
++ [Promise/A](/VoQn/pp.js/blob/master/doc/promise.md) - Implement [Promise/A](http://wiki.commonjs.org/wiki/Promises/A) of [CommonJS](http://www.commonjs.org/)
++ [Generator](/VoQn/pp.js/blob/master/doc/generator.md) - simple [Generator](http://wiki.ecmascript.org/doku.php?id=harmony:generators) like [ES-Harmony](https://mail.mozilla.org/pipermail/es-discuss/2008-August/006837.html)
 + [Control Flow API](/VoQn/pp.js/blob/master/doc/control_flow_api.md)
 + [Collection API](/VoQn/pp.js/master/doc/collection_api.md)
-
-### Continuation Object
-These function create instance of `Promise` and `Generator` that controller
-about Asynchonouse routine.
-
-+ [pp.promise](#promise) - Implement [Promise/A](http://wiki.commonjs.org/wiki/Promises/A) of [CommonJS](http://www.commonjs.org/)
-+ [pp.generator](#generator) - simple [Generator](http://wiki.ecmascript.org/doku.php?id=harmony:generators) like [ES-Harmony](https://mail.mozilla.org/pipermail/es-discuss/2008-August/006837.html)
 
 <a name="guide"/>
 # Guide
@@ -250,11 +244,4 @@ for accumulate array list.
 cpsAdd = (next, memo, value) ->
   next null, memo + value
 ```
-
--------------------------------------------------------------------------------
-
-<a name="reference"/>
-# Referrence
-
-__|||documentation writing now...|||__
 

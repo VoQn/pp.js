@@ -108,6 +108,15 @@ ppfib (e, x) ->
 
 <a name="until"/>
 ## pp.until(predicator, iterator, callback, init, [timeSlice])
+`pp.until` is reverse of `pp.whilist`
+
+### Arguments
+
+* predicator {Predicator} - test function that iterator should stop or not
+* iterator {Iterator} - loop procedure
+* callback(?Error, Array) callback procedure
+* init {Array} - parameter for loop iteration
+* timeSlice - **optional** time slice for iteration loop.
 
 -------------------------------------------------------------------------------
 
