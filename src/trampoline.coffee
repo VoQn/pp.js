@@ -1,7 +1,7 @@
 pp.extend (util) ->
   TIME_SLICE = do () ->
     slices = {}
-    for rate in [240, 120, 75, 60, 45, 30, 27, 15, 1]
+    for rate in [240, 120, 75, 60, 45, 30, 24, 15, 12, 10, 5, 2, 1]
       slices["FPS_#{rate}"] = ~~(1000 / rate)
     slices
 
