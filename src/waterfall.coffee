@@ -23,26 +23,26 @@ pp.extend (util) ->
       procedure
     procedureByIndex 0
 
-  waterfall: (procs, callback) ->
+  waterfall: pp.trampoline (procs, callback) ->
     return callback() unless procs.length
+    index = count = 0
+    limit = procs.length
+    memories = []
     finished = no
-    wrap = (iterator) ->
-      whenEnd = (results...) ->
-        callback.apply null, results
-        iterator.clearCache()
-        return
 
-      wrapped = (error, args...) ->
-        return if finished
-        if error
-          finished = yes
-          callback error
-          return
-        pp.defer () ->
-          next = iterator.next()
-          args.unshift if next then wrap next else whenEnd
-          iterator.apply iterator, args
-          return
-        return
-    pp.defer wrap pp.iterator procs
-    return
+    next = (error, results...) ->
+      return if finished
+      memories = results or []
+      if error or ++count >= limit
+        finished = yes
+        memories.unshift error or null
+        callback.apply null, memories
+      return
+
+    main = () ->
+      return if finished
+      if index >= count and index < limit
+        memories.unshift next
+        procs[index++].apply null, memories
+      main
+

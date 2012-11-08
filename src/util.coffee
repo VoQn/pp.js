@@ -60,3 +60,6 @@ pp.extend (util) ->
     else nextTimeout
   _invalidArgumentError: (api_name, any, message) ->
     new TypeError "#{api_name} - Invalid Argument : #{any}\n#{message}"
+  _sync:
+    map: (iterator, list) ->
+      iterator(item) for item in list
