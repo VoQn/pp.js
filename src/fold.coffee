@@ -11,9 +11,9 @@ pp.extend (util) ->
       getInit: 'pop'
 
   validateFoldOne = (name, target) ->
-    if not util.isArray target
+    if not util.isArray(target)
       message = "require Array (Not Null) to folding, but #{typeof target}"
-    else if not target.length
+    else if 1 > target.length
       message = 'Array length is 0, and without init value'
     else
       return
@@ -24,30 +24,58 @@ pp.extend (util) ->
 
     foldArray = (iterator, callback, init, array) ->
       memo = init
-      folding = (next, value, index, iterable) ->
-        index = selectIndex index, iterable.length
+      index = count = selected = 0
+      finished = no
+      limit = array.length
+      accumulate = key = null
+
+      folding = (value, index, iterable) ->
         accumulate = (error, result) ->
+          return if finished
           memo = result
-          next error
+          if error or ++count >= limit
+            finished = yes
+            callback(error, memo)
           return
-        iterator accumulate, memo, iterable[index], index, iterable
+        iterator(accumulate, memo, value, index, iterable)
         return
-      after = (error) ->
-        callback error, memo
-        return
-      util.forEach.order folding, after, array
+
+      main = () ->
+        return if finished
+        if count >= index and index < limit
+          key = selectIndex(index, limit)
+          folding(array[key], key, array)
+          ++index
+        return main
 
     getInit = direction.getInit
     fold1Name = direction.name + '1'
 
-    withInit: foldArray
-    withoutInit: (iterator, receiver, array) ->
-        error = validateFoldOne fold1Name, array
-        return receiver error if error
+    withInit: (iterator, receiver, init, array) ->
+      if typeof receiver isnt 'function'
+        throw new Error("callback is not function: #{typeof receiver}")
+        return
+      if typeof iterator isnt 'function'
+        receiver(new Error("iterator is not function: #{typeof iterator}"))
+        return
+      unless util.isArray(array)
+        receiver(new Error("foldable should kind of Array list"))
+        return
+      if 1 > array.length
+        receiver(null, init)
+        return
+      foldArray(iterator, receiver, init, array)
 
-        copied = array.slice()
-        init = copied[getInit]()
-        foldArray iterator, receiver, init, copied
+    withoutInit: (iterator, receiver, array) ->
+      error = validateFoldOne(fold1Name, array)
+      return receiver(error) if error
+
+      copied = array.slice()
+      init = copied[getInit]()
+      if 1 > copied.length
+        receiver(null, init)
+        return
+      foldArray(iterator, receiver, init, copied)
 
   fold =
     left: foldingFrom direction.left

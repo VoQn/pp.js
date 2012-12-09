@@ -1,73 +1,39 @@
 pp.extend (util) ->
-  forEach = (iterator, callback, iterable) ->
-    if util.isArray iterable
-      util.forEach.fill iterator, callback, iterable
-    else
-      util.forEach.hash.fill iterator, callback, iterable
 
-  predicators =
-    any: (iterator, callback, iterable) ->
-      check = (next, value, key, iterable) ->
-        collect = (error, result) ->
-          if result
-            next error, result, key
-          else
-            next error
-          return
-        iterator collect, value, key, iterable
+  some = (callback, state, limit) ->
+    next = (error, result) ->
+      return if state.hasFinished
+      if error or result or ++state.count >= limit
+        state.hasFinished = yes
+        callback(error or null, result or no)
+      return
+    () -> next
+
+  every = (callback, state, limit) ->
+    next = (error, result) ->
+      return if state.hasFinished
+      if error or not result
+        state.hasFinished = yes
+        callback(error or null, no)
         return
+      if ++state.count >= limit
+        state.hasFinished = yes
+        callback(null, yes)
+      return
+    () -> next
 
-      after = (error, result, key) ->
-        if arguments.length < 2
-          callback error, no
-        else
-          callback error, result, key
-        return
+  detect = (callback, state, limit) -> (value, key) -> (error, result) ->
+    return if state.hasFinished
+    if result
+      state.hasFinished = yes
+      callback(error or null, value, key)
+      return
+    if error or ++state.count >= limit
+      state.hasFinished = yes
+      callback(error or null)
+    return
 
-      forEach check, after, iterable
-
-    all: (iterator, callback, iterable) ->
-      check = (next, value, key, iterable) ->
-        collect = (error, result) ->
-          if result
-            next error
-          else
-            next error, result, key
-          return
-        iterator collect, value, key, iterable
-        return
-
-      after = (error, result, key) ->
-        if arguments.length < 2
-          callback error, yes
-        else
-          callback error, no, key
-        return
-
-      forEach check, after, iterable
-
-    find: (iterator, callback, iterable) ->
-      check = (next, value, key, iterable) ->
-        collect = (error, result) ->
-          if result
-            next error, value, key
-          else
-            next error
-          return
-
-        iterator collect, value, key, iterable
-        return
-
-      after = (error, value, key) ->
-        if arguments.length < 2
-          callback error
-        else
-          callback error, value, key
-        return
-
-      forEach check, after, iterable
-
-  validates = {}
-  for own name, proc of predicators
-    validates[name] = util.validateIteration "pp##{name}", proc
-  util.trampolines validates
+  util.trampolines
+    any:  util.iteratorMixin('pp#any',  'fill', some)
+    all:  util.iteratorMixin('pp#all',  'fill', every)
+    find: util.iteratorMixin('pp#find', 'fill', detect)

@@ -2,7 +2,7 @@ pp.extend (util) ->
   TIME_SLICE = do () ->
     slices = {}
     for rate in [240, 120, 75, 60, 45, 30, 24, 15, 12, 10, 5, 2, 1]
-      slices["FPS_#{rate}"] = ~~(1000 / rate)
+      slices["FPS_#{rate}"] = Math.floor(1000 / rate)
     slices
 
   getUnixTime = Date.now or -> +new Date()
@@ -19,16 +19,11 @@ pp.extend (util) ->
       procedure = procedure()
 
     if typeof procedure is 'function'
-      procStack.push procedure
-      timeStack.push timeSlice
+      procStack.push(procedure)
+      timeStack.push(timeSlice)
 
-    pp.defer invoke
+    pp.defer(invoke)
     return
-
-  limitTimeSlice = (timeSlice) ->
-    if typeof timeSlice isnt 'number'
-    then TIME_SLICE.FPS_240
-    else Math.max timeSlice, TIME_SLICE.FPS_240
 
   TIME_SLICE: TIME_SLICE
 
@@ -36,25 +31,33 @@ pp.extend (util) ->
     requireLength = fn.length
     partialized = (args...) ->
       if requireLength <= args.length
-        procStack.push fn.apply null, args.slice 0, requireLength
-        timeStack.push limitTimeSlice(
+        proc = fn.apply(null, args.slice(0, requireLength))
+        return if proc is undefined
+
+        timeSlice =
           if requireLength < args.length
           then args[requireLength]
           else null
-        )
-        pp.defer invoke if procStack.length is 1
+        if typeof timeSlice isnt 'number'
+          timeSlice = TIME_SLICE.FPS_240
+        else if timeSlice < TIME_SLICE.FPS_240
+          timeSlice = TIME_SLICE.FPS_240
+
+        procStack.push(proc)
+        timeStack.push(timeSlice)
+        pp.defer(invoke) if procStack.length is 1
         return
 
       apply = (adds...) ->
         return apply if adds.length < 1
-        partialized.apply null, args.concat adds
+        partialized.apply(null, args.concat(adds))
 
   _trampolines: (procedures) ->
     trampolines = {}
     for own name, proc of procedures
-      if name.match /^_/
+      if name.match(/^_/)
         trampolines[name] = proc
       else
         trampolines["_#{name}"] = proc
-        trampolines[name] = pp.trampoline proc
+        trampolines[name] = pp.trampoline(proc)
     trampolines
